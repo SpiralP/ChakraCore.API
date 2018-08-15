@@ -115,30 +115,26 @@ namespace ChakraCore.API
         throw new JavaScriptFatalException(result, "failed to get and clear exception");
       }
 
-
-      JavaScriptPropertyId messageName;
-      result = Native.JsGetPropertyIdFromName("message", out messageName);
+      result = Native.JsGetPropertyIdFromName("message", out JavaScriptPropertyId messageName);
       if (result != JavaScriptErrorCode.NoError)
       {
         throw new JavaScriptFatalException(result, "failed to get error message id");
       }
 
-      JavaScriptValue messageValue;
-      result = JsGetProperty(errorObject, messageName, out messageValue);
+      result = JsGetProperty(errorObject, messageName, out JavaScriptValue messageValue);
       if (result != JavaScriptErrorCode.NoError)
       {
         throw new JavaScriptFatalException(result, "failed to get error message");
       }
 
-      IntPtr message;
-      UIntPtr length;
-      result = JsStringToPointer(messageValue, out message, out length);
+      result = JsStringToPointer(messageValue, out IntPtr message, out UIntPtr length);
       if (result != JavaScriptErrorCode.NoError)
       {
         throw new JavaScriptFatalException(result, "failed to convert error message");
       }
       return Marshal.PtrToStringUni(message);
     }
+
 
     const string DllName = "ChakraCore";
 
@@ -309,7 +305,8 @@ namespace ChakraCore.API
     /// <param name="reference">The object to add a reference to.</param>
     /// <param name="count">The object's new reference count (can pass in null).</param>
     /// <returns>
-    ///     The code
+    ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
+    /// </returns>
     [DllImport(DllName)]
     public static extern JavaScriptErrorCode JsAddRef(JavaScriptValue reference, out uint count);
 
@@ -392,7 +389,6 @@ namespace ChakraCore.API
     /// </returns>
     [DllImport(DllName)]
     public static extern JavaScriptErrorCode JsSetCurrentContext(JavaScriptContext context);
-
 
     /// <summary>
     ///     Gets the script context that the object belongs to.
@@ -3560,7 +3556,7 @@ namespace ChakraCore.API
     ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
     /// </returns>
     [DllImport(DllName)]
-    public static extern JavaScriptErrorCode JsTTDCreateContext(
+    public static extern JavaScriptErrorCode JsTTDNotifyContextDestroy(
       JavaScriptContext context
     );
 

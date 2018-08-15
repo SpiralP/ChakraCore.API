@@ -67,45 +67,76 @@ namespace ChakraCore.API
       get { return new JavaScriptContext(IntPtr.Zero); }
     }
 
-    public static void SetObjectBeforeCollectCallback(JavaScriptValue reference, IntPtr callbackState, JavaScriptObjectBeforeCollectCallback beforeCollectCallback)
+    /// <summary>
+    ///     Gets a value indicating whether the context is a valid context or not.
+    /// </summary>
+    public bool IsValid
     {
-      Native.ThrowIfError(Native.JsSetObjectBeforeCollectCallback(reference, callbackState, beforeCollectCallback));
-    }
-
-    public static string GetLastError()
-    {
-      JavaScriptValue exception;
-      if (Native.JsGetAndClearException(out exception) != JavaScriptErrorCode.NoError)
-        return "failed to get and clear exception";
-
-      JavaScriptPropertyId messageName;
-      if (Native.JsGetPropertyIdFromName("message",
-          out messageName) != JavaScriptErrorCode.NoError)
-        return "failed to get error message id";
-
-      JavaScriptValue messageValue;
-      if (Native.JsGetProperty(exception, messageName, out messageValue)
-          != JavaScriptErrorCode.NoError)
-        return "failed to get error message";
-
-      IntPtr message;
-      UIntPtr length;
-      if (Native.JsStringToPointer(messageValue, out message, out length) != JavaScriptErrorCode.NoError)
-        return "failed to convert error message";
-
-      return Marshal.PtrToStringUni(message);
+      get { return reference != IntPtr.Zero; }
     }
 
 
     /// <summary>
+    ///     Adds a reference to a garbage collected object.
+    /// </summary>
+    /// <remarks>
+    ///     This only needs to be called on <c>JsRef</c> handles that are not going to be stored
+    ///     somewhere on the stack. Calling <c>JsAddRef</c> ensures that the object the <c>JsRef</c>
+    ///     refers to will not be freed until <c>JsRelease</c> is called.
+    /// </remarks>
+    /// <returns>
+    ///     The object's new reference count.
+    /// </returns>
+    public uint AddRef()
+    {
+      Native.ThrowIfError(Native.JsAddRef(this, out uint count));
+      return count;
+    }
+
+    /// <summary>
+    ///     Releases a reference to a garbage collected object.
+    /// </summary>
+    /// <remarks>
+    ///     Removes a reference to a <c>JsRef</c> handle that was created by <c>JsAddRef</c>.
+    /// </remarks>
+    /// <returns>
+    ///     The object's new reference count.
+    /// </returns>
+    public uint Release()
+    {
+      Native.ThrowIfError(Native.JsRelease(this, out uint count));
+      return count;
+    }
+
+    /// <summary>
+    ///     Creates a script context for running scripts.
+    /// </summary>
+    /// <remarks>
+    ///     Each script context has its own global object that is isolated from all other script
+    ///     contexts.
+    /// </remarks>
+    /// <param name="runtime">The runtime the script context is being created in.</param>
+    /// <returns>
+    ///     The created script context.
+    /// </returns>
+    public static JavaScriptContext CreateContext(JavaScriptRuntime runtime)
+    {
+      Native.ThrowIfError(Native.JsCreateContext(runtime, out JavaScriptContext newContext));
+      return newContext;
+    }
+
+    /// <summary>
     ///     Gets or sets the current script context on the thread.
     /// </summary>
+    /// <param name="context">The script context to make current.</param>
+    /// <returns>
+    ///     The current script context on the thread, null if there is no current script context.
+    /// </returns>
     public static JavaScriptContext Current
     {
       get
       {
-        JavaScriptContext reference;
-        Native.ThrowIfError(Native.JsGetCurrentContext(out reference));
+        Native.ThrowIfError(Native.JsGetCurrentContext(out JavaScriptContext reference));
         return reference;
       }
 
@@ -115,15 +146,122 @@ namespace ChakraCore.API
       }
     }
 
+
     /// <summary>
-    ///     Gets a value indicating whether the runtime of the current context is in an exception state.
+    ///     Gets the script context that the object belongs to.
+    /// </summary>
+    /// <param name="obj">The object to get the context from.</param>
+    /// <returns>
+    ///     The context the object belongs to.
+    /// </returns>
+    public static JavaScriptContext GetContextOfObject(JavaScriptValue obj)
+    {
+      Native.ThrowIfError(Native.JsGetContextOfObject(obj, out JavaScriptContext context));
+      return context;
+    }
+
+    /// <summary>
+    ///     Gets the internal data set on JsrtContext.
+    /// </summary>
+    /// <returns>
+    ///     The pointer to the data where data will be returned.
+    /// </returns>
+    public IntPtr GetContextData()
+    {
+      Native.ThrowIfError(Native.JsGetContextData(this, out IntPtr data));
+      return data;
+    }
+
+    /// <summary>
+    ///     Sets the internal data of JsrtContext.
+    /// </summary>
+    /// <param name="data">The pointer to the data to be set.</param>
+    public void SetContextData(IntPtr data)
+    {
+      Native.ThrowIfError(Native.JsSetContextData(this, data));
+    }
+
+    /// <summary>
+    ///     Gets the runtime that the context belongs to.
+    /// </summary>
+    /// <returns>
+    ///     The runtime the context belongs to.
+    /// </returns>
+    public JavaScriptRuntime GetRuntime()
+    {
+      Native.ThrowIfError(Native.JsGetRuntime(this, out JavaScriptRuntime runtime));
+      return runtime;
+    }
+
+
+    // Debug Functions
+
+    /// <summary>
+    ///     TTD API -- may change in future versions:
+    ///     Creates a script context that takes the TTD mode from the log or explicitly is not in TTD mode (regular takes mode from currently active script).
+    /// </summary>
+    /// <param name="runtime">The runtime the script context is being created in.</param>
+    /// <param name="useRuntimeTTDMode">Set to true to use runtime TTD mode false to explicitly be non-TTD context.</param>
+    /// <param name="newContext">The created script context.</param>
+    /// <returns>
+    ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
+    /// </returns>
+    public static JavaScriptContext TTDCreateContext(
+      JavaScriptRuntime runtimeHandle,
+      bool useRuntimeTTDMode
+    )
+    {
+      Native.ThrowIfError(Native.JsTTDCreateContext(runtimeHandle, useRuntimeTTDMode, out JavaScriptContext newContext));
+      return newContext;
+    }
+
+    /// <summary>
+    ///     TTD API -- may change in future versions:
+    ///     Notify the time-travel system that a context has been identified as dead by the gc (and is being de-allocated).
+    /// </summary>
+    /// <param name="context">The script context that is now dead.</param>
+    /// <returns>
+    ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
+    /// </returns>
+    public void TTDNotifyContextDestroy()
+    {
+      Native.ThrowIfError(Native.JsTTDNotifyContextDestroy(this));
+    }
+
+
+    //
+
+    public static string GetLastError()
+    {
+      if (Native.JsGetAndClearException(out JavaScriptValue exception) != JavaScriptErrorCode.NoError)
+        return "failed to get and clear exception";
+
+      if (
+        Native.JsGetPropertyIdFromName("message", out JavaScriptPropertyId messageName) !=
+        JavaScriptErrorCode.NoError
+      )
+        return "failed to get error message id";
+
+      if (Native.JsGetProperty(exception, messageName, out JavaScriptValue messageValue)
+          != JavaScriptErrorCode.NoError)
+        return "failed to get error message";
+
+      if (Native.JsStringToPointer(messageValue, out IntPtr message, out UIntPtr length) != JavaScriptErrorCode.NoError)
+        return "failed to convert error message";
+
+      return Marshal.PtrToStringUni(message);
+    }
+
+
+    /// <summary>
+    ///     Determines whether the runtime of the current context is in an exception state.
     /// </summary>
     /// <remarks>
     ///     <para>
     ///     If a call into the runtime results in an exception (either as the result of running a
     ///     script or due to something like a conversion failure), the runtime is placed into an
     ///     "exception state." All calls into any context created by the runtime (except for the
-    ///     exception APIs) will fail with <c>InExceptionState</c> until the exception is
+    ///     exception APIs) will fail with <c>JsErrorInExceptionState</c> until the exception is
     ///     cleared.
     ///     </para>
     ///     <para>
@@ -134,36 +272,66 @@ namespace ChakraCore.API
     ///     Requires an active script context.
     ///     </para>
     /// </remarks>
+    /// <returns>
+    ///     Whether the runtime of the current context is in the exception state.
+    /// </returns>
     public static bool HasException
     {
       get
       {
-        bool hasException;
-        Native.ThrowIfError(Native.JsHasException(out hasException));
+        Native.ThrowIfError(Native.JsHasException(out bool hasException));
         return hasException;
       }
     }
 
     /// <summary>
-    ///     Gets the runtime that the context belongs to.
+    ///     Returns the exception that caused the runtime of the current context to be in the
+    ///     exception state and resets the exception state for that runtime.
     /// </summary>
-    public JavaScriptRuntime Runtime
+    /// <remarks>
+    ///     <para>
+    ///     If the runtime of the current context is not in an exception state, this API will return
+    ///     <c>JsErrorInvalidArgument</c>. If the runtime is disabled, this will return an exception
+    ///     indicating that the script was terminated, but it will not clear the exception (the
+    ///     exception will be cleared if the runtime is re-enabled using
+    ///     <c>JsEnableRuntimeExecution</c>).
+    ///     </para>
+    ///     <para>
+    ///     Requires an active script context.
+    ///     </para>
+    /// </remarks>
+    /// <returns>
+    ///     The exception for the runtime of the current context.
+    /// </returns>
+    public static JavaScriptValue GetAndClearException()
     {
-      get
-      {
-        JavaScriptRuntime handle;
-        Native.ThrowIfError(Native.JsGetRuntime(this, out handle));
-        return handle;
-      }
+      Native.ThrowIfError(Native.JsGetAndClearException(out JavaScriptValue exception));
+      return exception;
     }
 
     /// <summary>
-    ///     Gets a value indicating whether the context is a valid context or not.
+    ///     Sets the runtime of the current context to an exception state.
     /// </summary>
-    public bool IsValid
+    /// <remarks>
+    ///     <para>
+    ///     If the runtime of the current context is already in an exception state, this API will
+    ///     return <c>JsErrorInExceptionState</c>.
+    ///     </para>
+    ///     <para>
+    ///     Requires an active script context.
+    ///     </para>
+    /// </remarks>
+    /// <param name="exception">
+    ///     The JavaScript exception to set for the runtime of the current context.
+    /// </param>
+    public static void SetException(JavaScriptValue exception)
     {
-      get { return reference != IntPtr.Zero; }
+      Native.ThrowIfError(Native.JsSetException(exception));
     }
+
+
+
+    // the rest
 
     /// <summary>
     ///     Tells the runtime to do any idle processing it need to do.
@@ -189,8 +357,7 @@ namespace ChakraCore.API
     /// </returns>
     public static uint Idle()
     {
-      uint ticks;
-      Native.ThrowIfError(Native.JsIdle(out ticks));
+      Native.ThrowIfError(Native.JsIdle(out uint ticks));
       return ticks;
     }
 
@@ -208,8 +375,7 @@ namespace ChakraCore.API
     /// <returns>A <c>Function</c> representing the script code.</returns>
     public static JavaScriptValue ParseScript(string script, JavaScriptSourceContext sourceContext, string sourceName)
     {
-      JavaScriptValue result;
-      Native.ThrowIfError(Native.JsParseScript(script, sourceContext, sourceName, out result));
+      Native.ThrowIfError(Native.JsParseScript(script, sourceContext, sourceName, out JavaScriptValue result));
       return result;
     }
 
@@ -228,8 +394,7 @@ namespace ChakraCore.API
     /// <returns>A <c>Function</c> representing the script code.</returns>
     public static JavaScriptValue ParseScript(string script, byte[] buffer, JavaScriptSourceContext sourceContext, string sourceName)
     {
-      JavaScriptValue result;
-      Native.ThrowIfError(Native.JsParseSerializedScript(script, buffer, sourceContext, sourceName, out result));
+      Native.ThrowIfError(Native.JsParseSerializedScript(script, buffer, sourceContext, sourceName, out JavaScriptValue result));
       return result;
     }
 
@@ -274,10 +439,9 @@ namespace ChakraCore.API
     /// <returns>The result of the script, if any.</returns>
     public static JavaScriptValue RunScript(string script, JavaScriptSourceContext sourceContext, string sourceName)
     {
-      JavaScriptValue result;
       JavaScriptValue scriptValue = JavaScriptValue.FromString(script);
       JavaScriptValue name = JavaScriptValue.FromString(sourceName);
-      Native.ThrowIfError(Native.JsRun(scriptValue, sourceContext, name, JavaScriptParseScriptAttributes.JsParseScriptAttributeNone, out result));
+      Native.ThrowIfError(Native.JsRun(scriptValue, sourceContext, name, JavaScriptParseScriptAttributes.JsParseScriptAttributeNone, out JavaScriptValue result));
       return result;
     }
 
@@ -296,8 +460,7 @@ namespace ChakraCore.API
     /// <returns>The result of the script, if any.</returns>
     public static JavaScriptValue RunScript(string script, byte[] buffer, JavaScriptSourceContext sourceContext, string sourceName)
     {
-      JavaScriptValue result;
-      Native.ThrowIfError(Native.JsRunSerializedScript(script, buffer, sourceContext, sourceName, out result));
+      Native.ThrowIfError(Native.JsRunSerializedScript(script, buffer, sourceContext, sourceName, out JavaScriptValue result));
       return result;
     }
 
@@ -351,78 +514,6 @@ namespace ChakraCore.API
       var bufferSize = (ulong)buffer.Length;
       Native.ThrowIfError(Native.JsSerializeScript(script, buffer, ref bufferSize));
       return bufferSize;
-    }
-
-    /// <summary>
-    ///     Returns the exception that caused the runtime of the current context to be in the
-    ///     exception state and resets the exception state for that runtime.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///     If the runtime of the current context is not in an exception state, this API will throw
-    ///     <c>JsErrorInvalidArgument</c>. If the runtime is disabled, this will return an exception
-    ///     indicating that the script was terminated, but it will not clear the exception (the
-    ///     exception will be cleared if the runtime is re-enabled using
-    ///     <c>EnableRuntimeExecution</c>).
-    ///     </para>
-    ///     <para>
-    ///     Requires an active script context.
-    ///     </para>
-    /// </remarks>
-    /// <returns>The exception for the runtime of the current context.</returns>
-    public static JavaScriptValue GetAndClearException()
-    {
-      JavaScriptValue reference;
-      Native.ThrowIfError(Native.JsGetAndClearException(out reference));
-      return reference;
-    }
-
-    /// <summary>
-    ///     Sets the runtime of the current context to an exception state.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///     If the runtime of the current context is already in an exception state, this API will
-    ///     throw <c>JsErrorInExceptionState</c>.
-    ///     </para>
-    ///     <para>
-    ///     Requires an active script context.
-    ///     </para>
-    /// </remarks>
-    /// <param name="exception">
-    ///     The JavaScript exception to set for the runtime of the current context.
-    /// </param>
-    public static void SetException(JavaScriptValue exception)
-    {
-      Native.ThrowIfError(Native.JsSetException(exception));
-    }
-
-    /// <summary>
-    ///     Adds a reference to a script context.
-    /// </summary>
-    /// <remarks>
-    ///     Calling AddRef ensures that the context will not be freed until Release is called.
-    /// </remarks>
-    /// <returns>The object's new reference count.</returns>
-    public uint AddRef()
-    {
-      uint count;
-      Native.ThrowIfError(Native.JsAddRef(this, out count));
-      return count;
-    }
-
-    /// <summary>
-    ///     Releases a reference to a script context.
-    /// </summary>
-    /// <remarks>
-    ///     Removes a reference to a context that was created by AddRef.
-    /// </remarks>
-    /// <returns>The object's new reference count.</returns>
-    public uint Release()
-    {
-      uint count;
-      Native.ThrowIfError(Native.JsRelease(this, out count));
-      return count;
     }
 
     /// <summary>
