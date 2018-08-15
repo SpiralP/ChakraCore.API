@@ -16,6 +16,23 @@ namespace ChakraCore.API
     /// The reference.
     /// </summary>
     private readonly IntPtr reference;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="JavaScriptProjectionCallbackContext"/> struct.
+    /// </summary>
+    /// <param name="reference">The reference.</param>
+    private JavaScriptProjectionCallbackContext(IntPtr reference)
+    {
+      this.reference = reference;
+    }
+
+    /// <summary>
+    ///     Gets an invalid ID.
+    /// </summary>
+    public static JavaScriptProjectionCallbackContext Invalid
+    {
+      get { return new JavaScriptProjectionCallbackContext(IntPtr.Zero); }
+    }
   }
 
   /// <summary>
@@ -26,7 +43,9 @@ namespace ChakraCore.API
   ///     Requires calling JsSetProjectionEnqueueCallback to receive callbacks.
   /// </remarks>
   /// <param name="jsContext">The context originally received by a call to JsProjectionEnqueueCallback.</param>
-  public delegate void JavaScriptProjectionCallback(JavaScriptProjectionCallbackContext jsContext);
+  public delegate void JavaScriptProjectionCallback(
+    JavaScriptProjectionCallbackContext jsContext
+  );
 
   /// <summary>
   ///     The application callback which is called by Jsrt when a projection API is completed on
@@ -38,5 +57,9 @@ namespace ChakraCore.API
   /// <param name="jsCallbck">The callback to be invoked on the original thread.</param>
   /// <param name="callbackState">The applications context.</param>
   /// <param name="jsContext">The Jsrt context that must be passed into jsCallback.</param>
-  public delegate void JavaScriptProjectionEnqueueCallback(JavaScriptProjectionCallback jsCallback, JavaScriptProjectionCallbackContext jsContext, IntPtr callbackState);
+  public delegate void JavaScriptProjectionEnqueueCallback(
+    JavaScriptProjectionCallback jsCallback,
+    JavaScriptProjectionCallbackContext jsContext,
+    IntPtr callbackState
+  );
 }

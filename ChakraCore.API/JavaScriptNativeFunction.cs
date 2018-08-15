@@ -8,9 +8,9 @@ namespace ChakraCore.API
   /// </summary>
   public struct JavaScriptNativeFunctionInfo
   {
-    JavaScriptValue thisArg;
-    JavaScriptValue newTargetArg;
-    bool isConstructCall;
+    public JavaScriptValue thisArg;
+    public JavaScriptValue newTargetArg;
+    public bool isConstructCall;
   }
 
   /// <summary>
@@ -29,7 +29,7 @@ namespace ChakraCore.API
   // typedef _Ret_maybenull_ JsValueRef(CHAKRA_CALLBACK* JsEnhancedNativeFunction)(_In_ JsValueRef callee, _In_ JsValueRef* arguments, _In_ unsigned short argumentCount, _In_ JsNativeFunctionInfo* info, _In_opt_ void* callbackState);
   public delegate JavaScriptValue JavaScriptEnhancedNativeFunction(JavaScriptValue callee, JavaScriptValue[] arguments, ushort argumentCount, JavaScriptNativeFunctionInfo info, IntPtr callbackState);
 
-  
+
   /// <summary>
   ///     A function callback.
   /// </summary>

@@ -46,8 +46,7 @@ namespace ChakraCore.API
     {
       get
       {
-        UIntPtr memoryUsage;
-        Native.ThrowIfError(Native.JsGetRuntimeMemoryUsage(this, out memoryUsage));
+        Native.ThrowIfError(Native.JsGetRuntimeMemoryUsage(this, out UIntPtr memoryUsage));
         return memoryUsage;
       }
     }
@@ -63,8 +62,7 @@ namespace ChakraCore.API
     {
       get
       {
-        UIntPtr memoryLimit;
-        Native.ThrowIfError(Native.JsGetRuntimeMemoryLimit(this, out memoryLimit));
+        Native.ThrowIfError(Native.JsGetRuntimeMemoryLimit(this, out UIntPtr memoryLimit));
         return memoryLimit;
       }
 
@@ -81,8 +79,7 @@ namespace ChakraCore.API
     {
       get
       {
-        bool isDisabled;
-        Native.ThrowIfError(Native.JsIsRuntimeExecutionDisabled(this, out isDisabled));
+        Native.ThrowIfError(Native.JsIsRuntimeExecutionDisabled(this, out bool isDisabled));
         return isDisabled;
       }
 
@@ -103,8 +100,7 @@ namespace ChakraCore.API
     /// <returns>The runtime created.</returns>
     public static JavaScriptRuntime Create(JavaScriptRuntimeAttributes attributes, JavaScriptRuntimeVersion version, JavaScriptThreadServiceCallback threadServiceCallback)
     {
-      JavaScriptRuntime handle;
-      Native.ThrowIfError(Native.JsCreateRuntime(attributes, threadServiceCallback, out handle));
+      Native.ThrowIfError(Native.JsCreateRuntime(attributes, threadServiceCallback, out JavaScriptRuntime handle));
       return handle;
     }
 
@@ -218,8 +214,7 @@ namespace ChakraCore.API
     /// <returns>The created script context.</returns>
     public JavaScriptContext CreateContext()
     {
-      JavaScriptContext reference;
-      Native.ThrowIfError(Native.JsCreateContext(this, out reference));
+      Native.ThrowIfError(Native.JsCreateContext(this, out JavaScriptContext reference));
       return reference;
     }
   }
