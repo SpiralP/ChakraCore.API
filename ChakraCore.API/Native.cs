@@ -2744,6 +2744,9 @@ namespace ChakraCore.API
     /// </summary>
     /// <remarks>
     ///     <para>
+    ///     ### This API is Windows-only (see JsSerialize for cross-platform equivalent).
+    ///     </para>
+    ///     <para>
     ///     <c>JsSerializeScript</c> parses a script and then stores the parsed form of the script in a
     ///     runtime-independent format. The serialized script then can be deserialized in any
     ///     runtime without requiring the script to be re-parsed.
@@ -2847,6 +2850,9 @@ namespace ChakraCore.API
     /// </summary>
     /// <remarks>
     ///     <para>
+    ///     ### This API is Windows-only (see JsParseSerialized for cross-platform equivalent).
+    ///     </para>
+    ///     <para>
     ///     Requires an active script context.
     ///     </para>
     ///     <para>
@@ -2877,6 +2883,9 @@ namespace ChakraCore.API
     ///     Runs a serialized script.
     /// </summary>
     /// <remarks>
+    ///     <para>
+    ///     ### This API is Windows-only (see JsParseSerialized for cross-platform equivalent).
+    ///     </para>
     ///     <para>
     ///     Requires an active script context.
     ///     </para>

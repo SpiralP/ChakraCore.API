@@ -759,6 +759,11 @@ namespace ChakraCore.API
       Native.ThrowIfError(Native.JsSetProperty(this, id, value, useStrictRules));
     }
 
+    public void SetProperty(string id, JavaScriptValue value, bool useStrictRules = true)
+    {
+      this.SetProperty(JavaScriptPropertyId.FromString(id), value, useStrictRules);
+    }
+
     /// <summary>
     ///     Deletes an object's property.
     /// </summary>
