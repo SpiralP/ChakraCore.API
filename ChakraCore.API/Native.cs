@@ -115,24 +115,19 @@ namespace ChakraCore.API
         throw new JavaScriptFatalException(result, "failed to get and clear exception");
       }
 
-      result = Native.JsGetPropertyIdFromName("message", out JavaScriptPropertyId messageName);
+      result = JsGetProperty(errorObject, JavaScriptPropertyId.FromString("stack"), out JavaScriptValue stackValue);
       if (result != JavaScriptErrorCode.NoError)
       {
-        throw new JavaScriptFatalException(result, "failed to get error message id");
+        throw new JavaScriptFatalException(result, "failed to get error stack property");
       }
 
-      result = JsGetProperty(errorObject, messageName, out JavaScriptValue messageValue);
+      result = JsStringToPointer(stackValue, out IntPtr stack, out UIntPtr stackLength);
       if (result != JavaScriptErrorCode.NoError)
       {
-        throw new JavaScriptFatalException(result, "failed to get error message");
+        throw new JavaScriptFatalException(result, "failed to convert error stack to pointer");
       }
 
-      result = JsStringToPointer(messageValue, out IntPtr message, out UIntPtr length);
-      if (result != JavaScriptErrorCode.NoError)
-      {
-        throw new JavaScriptFatalException(result, "failed to convert error message");
-      }
-      return Marshal.PtrToStringUni(message);
+      return Marshal.PtrToStringUni(stack);
     }
 
 
@@ -1375,7 +1370,11 @@ namespace ChakraCore.API
     ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
     /// </returns>
     [DllImport(DllName)]
-    public static extern JavaScriptErrorCode JsCreateFunction(JavaScriptNativeFunction nativeFunction, IntPtr externalData, out JavaScriptValue function);
+    public static extern JavaScriptErrorCode JsCreateFunction(
+      JavaScriptNativeFunction nativeFunction,
+      IntPtr externalData,
+      out JavaScriptValue function
+    );
 
     /// <summary>
     ///     Creates a new JavaScript function with name.
@@ -1393,7 +1392,12 @@ namespace ChakraCore.API
     ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
     /// </returns>
     [DllImport(DllName)]
-    public static extern JavaScriptErrorCode JsCreateNamedFunction(JavaScriptValue name, JavaScriptNativeFunction nativeFunction, IntPtr callbackState, out JavaScriptValue function);
+    public static extern JavaScriptErrorCode JsCreateNamedFunction(
+      JavaScriptValue name,
+      JavaScriptNativeFunction nativeFunction,
+      IntPtr callbackState,
+      out JavaScriptValue function
+    );
 
     /// <summary>
     ///     Creates a new JavaScript error object
@@ -1860,7 +1864,12 @@ namespace ChakraCore.API
     ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
     /// </returns>
     [DllImport(DllName)]
-    public static extern JavaScriptErrorCode JsCopyString(JavaScriptValue value, StringBuilder buffer, uint bufferSize, out UIntPtr length);
+    public static extern JavaScriptErrorCode JsCopyString(
+      JavaScriptValue value,
+      StringBuilder buffer, // _Out_opt_ char* buffer
+      UIntPtr bufferSize, // _In_ size_t bufferSize
+      out UIntPtr length // _Out_opt_ size_t* length
+    );
 
     /// <summary>
     ///     Write string value into Utf16 string buffer
@@ -1888,7 +1897,13 @@ namespace ChakraCore.API
     ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
     /// </returns>
     [DllImport(DllName, CharSet = CharSet.Unicode)]
-    public static extern JavaScriptErrorCode JsCopyStringUtf16(JavaScriptValue value, int start, int length, StringBuilder buffer, out UIntPtr written);
+    public static extern JavaScriptErrorCode JsCopyStringUtf16(
+      JavaScriptValue value,
+      int start,
+      int length,
+      StringBuilder buffer, // _Out_opt_ uint16_t* buffer
+      out UIntPtr written // _Out_opt_ size_t* written
+    );
 
     /// <summary>
     ///     Parses a script and returns a function representing the script.
@@ -1983,7 +1998,11 @@ namespace ChakraCore.API
     ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
     /// </returns>
     [DllImport(DllName)]
-    public static extern JavaScriptErrorCode JsCreatePropertyId(string name, UIntPtr length, out JavaScriptPropertyId propertyId);
+    public static extern JavaScriptErrorCode JsCreatePropertyId(
+      string name,
+      UIntPtr length,
+      out JavaScriptPropertyId propertyId
+    );
 
     /// <summary>
     ///     Copies the name associated with the property ID into a buffer.
@@ -2006,7 +2025,12 @@ namespace ChakraCore.API
     ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
     /// </returns>
     [DllImport(DllName)]
-    public static extern JavaScriptErrorCode JsCopyPropertyId(JavaScriptPropertyId propertyId, StringBuilder buffer, UIntPtr bufferSize, out UIntPtr written);
+    public static extern JavaScriptErrorCode JsCopyPropertyId(
+      JavaScriptPropertyId propertyId,
+      StringBuilder buffer, // _Out_ char* buffer
+      UIntPtr bufferSize,
+      out UIntPtr written
+    );
 
     /// <summary>
     ///     Serializes a parsed script to a buffer than can be reused.
@@ -2274,7 +2298,7 @@ namespace ChakraCore.API
       JavaScriptValue value,
       int start,
       int length,
-      out string buffer,
+      StringBuilder buffer, // _Out_ char* buffer
       out UIntPtr written
     );
 

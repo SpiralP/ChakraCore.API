@@ -24,6 +24,31 @@ namespace ChakraCore.API
     /// </summary>
     private readonly IntPtr reference;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="JavaScriptContext"/> struct.
+    /// </summary>
+    /// <param name="reference">The reference.</param>
+    internal JavaScriptContext(IntPtr reference)
+    {
+      this.reference = reference;
+    }
+
+    /// <summary>
+    ///     Gets an invalid context.
+    /// </summary>
+    public static JavaScriptContext Invalid
+    {
+      get { return new JavaScriptContext(IntPtr.Zero); }
+    }
+
+    /// <summary>
+    ///     Gets a value indicating whether the context is a valid context or not.
+    /// </summary>
+    public bool IsValid
+    {
+      get { return reference != IntPtr.Zero; }
+    }
+
     public static bool operator ==(JavaScriptContext lhs, JavaScriptContext rhs)
     {
       return lhs.reference == rhs.reference;
@@ -48,31 +73,6 @@ namespace ChakraCore.API
     public override int GetHashCode()
     {
       return reference.GetHashCode();
-    }
-
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="JavaScriptContext"/> struct.
-    /// </summary>
-    /// <param name="reference">The reference.</param>
-    internal JavaScriptContext(IntPtr reference)
-    {
-      this.reference = reference;
-    }
-
-    /// <summary>
-    ///     Gets an invalid context.
-    /// </summary>
-    public static JavaScriptContext Invalid
-    {
-      get { return new JavaScriptContext(IntPtr.Zero); }
-    }
-
-    /// <summary>
-    ///     Gets a value indicating whether the context is a valid context or not.
-    /// </summary>
-    public bool IsValid
-    {
-      get { return reference != IntPtr.Zero; }
     }
 
 

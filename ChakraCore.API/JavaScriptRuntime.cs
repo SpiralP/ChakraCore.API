@@ -28,6 +28,23 @@ namespace ChakraCore.API
     private IntPtr handle;
 
     /// <summary>
+    ///     Initializes a new instance of the <see cref="JavaScriptRuntime"/> struct.
+    /// </summary>
+    /// <param name="handle">The handle.</param>
+    internal JavaScriptRuntime(IntPtr handle)
+    {
+      this.handle = handle;
+    }
+
+    /// <summary>
+    ///     Gets an invalid runtime.
+    /// </summary>
+    public static JavaScriptRuntime Invalid
+    {
+      get { return new JavaScriptRuntime(IntPtr.Zero); }
+    }
+
+    /// <summary>
     ///     Gets a value indicating whether the runtime is valid.
     /// </summary>
     public bool IsValid

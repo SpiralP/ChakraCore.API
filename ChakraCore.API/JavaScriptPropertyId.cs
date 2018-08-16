@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace ChakraCore.API
 {
@@ -45,9 +46,26 @@ namespace ChakraCore.API
     {
       get
       {
-        string name;
-        Native.ThrowIfError(Native.JsGetPropertyNameFromId(this, out name));
-        return name;
+        Native.ThrowIfError(
+          Native.JsCopyPropertyId(
+            this,
+            null,
+            (UIntPtr)0,
+            out UIntPtr bufferSize
+          )
+        );
+
+        StringBuilder buffer = new StringBuilder((int)bufferSize);
+        Native.ThrowIfError(
+          Native.JsCopyPropertyId(
+            this,
+            buffer,
+            bufferSize,
+            out UIntPtr written
+          )
+        );
+
+        return buffer.ToString(); // using start/length doesn't work here because it wants character position, not byte length
       }
     }
 
@@ -68,8 +86,13 @@ namespace ChakraCore.API
     /// <returns>The property ID in this runtime for the given name.</returns>
     public static JavaScriptPropertyId FromString(string name)
     {
-      JavaScriptPropertyId id;
-      Native.ThrowIfError(Native.JsGetPropertyIdFromName(name, out id));
+      Native.ThrowIfError(
+        Native.JsCreatePropertyId(
+          name,
+          (UIntPtr)Encoding.UTF8.GetByteCount(name),
+          out JavaScriptPropertyId id
+        )
+      );
       return id;
     }
 
@@ -102,7 +125,7 @@ namespace ChakraCore.API
     /// <returns>Whether the two property IDs are the same.</returns>
     public bool Equals(JavaScriptPropertyId other)
     {
-      return id == other.id;
+      return this.id == other.id;
     }
 
     /// <summary>

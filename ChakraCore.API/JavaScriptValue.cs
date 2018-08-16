@@ -335,7 +335,13 @@ namespace ChakraCore.API
     /// <returns>The new <c>String</c> value.</returns>
     public static JavaScriptValue FromString(string value)
     {
-      Native.ThrowIfError(Native.JsCreateStringUtf16(value, new UIntPtr((uint)value.Length), out JavaScriptValue reference));
+      Native.ThrowIfError(
+        Native.JsCreateStringUtf16(
+          value,
+          (UIntPtr)value.Length,
+          out JavaScriptValue reference
+        )
+      );
       return reference;
     }
 
@@ -620,11 +626,25 @@ namespace ChakraCore.API
     /// <returns>The string.</returns>
     public new string ToString()
     {
-      Native.ThrowIfError(Native.JsGetStringLength(this, out int bufferSize));
-      StringBuilder sb = new StringBuilder(bufferSize);
-      Native.ThrowIfError(Native.JsCopyStringUtf16(this, 0, bufferSize, sb, out UIntPtr size));
-      string ss = sb.ToString(0, (int)size);
-      return ss;
+      Native.ThrowIfError(
+        Native.JsGetStringLength(
+          this,
+          out int bufferLength
+        )
+      ); // using JsCopyStringUtf16 to get needed size needs a max length number
+
+      StringBuilder sb = new StringBuilder(bufferLength);
+      Native.ThrowIfError(
+        Native.JsCopyStringUtf16(
+          this,
+          0,
+          bufferLength,
+          sb,
+          out UIntPtr written
+        )
+      );
+
+      return sb.ToString(0, (int)written); // works because written is "characters written"
     }
 
     /// <summary>
