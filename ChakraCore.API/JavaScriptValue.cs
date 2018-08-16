@@ -35,6 +35,42 @@ namespace ChakraCore.API
     }
 
     /// <summary>
+    ///     Gets a value indicating whether the value is a valid or not.
+    /// </summary>
+    public bool IsValid
+    {
+      get { return reference != IntPtr.Zero; }
+    }
+
+    public static bool operator ==(JavaScriptValue lhs, JavaScriptValue rhs)
+    {
+      return lhs.reference == rhs.reference;
+    }
+
+    public static bool operator !=(JavaScriptValue lhs, JavaScriptValue rhs)
+    {
+      return lhs.reference != rhs.reference;
+    }
+    public override bool Equals(object obj)
+    {
+      if (obj is JavaScriptValue)
+      {
+        return (this == (JavaScriptValue)obj);
+      }
+      else
+      {
+        return false;
+      }
+    }
+
+    public override int GetHashCode()
+    {
+      return reference.GetHashCode();
+    }
+
+
+
+    /// <summary>
     ///     Gets the value of <c>undefined</c> in the current script context.
     /// </summary>
     /// <remarks>
@@ -171,14 +207,6 @@ namespace ChakraCore.API
         Native.ThrowIfError(Native.JsGetGlobalObject(out JavaScriptValue value));
         return value;
       }
-    }
-
-    /// <summary>
-    ///     Gets a value indicating whether the value is valid.
-    /// </summary>
-    public bool IsValid
-    {
-      get { return reference != IntPtr.Zero; }
     }
 
     /// <summary>

@@ -1642,7 +1642,12 @@ namespace ChakraCore.API
     ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
     /// </returns>
     [DllImport(DllName)]
-    public static extern JavaScriptErrorCode JsCreateEnhancedFunction(JavaScriptEnhancedNativeFunction nativeFunction, JavaScriptValue metadata, IntPtr callbackState, out JavaScriptValue function);
+    public static extern JavaScriptErrorCode JsCreateEnhancedFunction(
+      JavaScriptEnhancedNativeFunction nativeFunction,
+      JavaScriptValue metadata,
+      IntPtr callbackState,
+      out JavaScriptValue function
+    );
 
     /// <summary>
     ///     Initialize a ModuleRecord from host
