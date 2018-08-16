@@ -376,6 +376,32 @@ namespace ChakraCore.API
     }
 
     /// <summary>
+    ///     Creates a new object (with prototype) that stores some external data.
+    /// </summary>
+    /// <remarks>
+    ///     Requires an active script context.
+    /// </remarks>
+    /// <param name="data">External data that the object will represent. May be null.</param>
+    /// <param name="finalizeCallback">
+    ///     A callback for when the object is finalized. May be null.
+    /// </param>
+    /// <param name="prototype">Prototype object or nullptr.</param>
+    /// <returns>
+    ///     The new object.
+    /// </returns>
+    public static JavaScriptValue CreateExternalObjectWithPrototype(
+      IntPtr data,
+      JavaScriptFinalizeCallback finalizeCallback,
+      JavaScriptValue prototype
+    )
+    {
+      Native.ThrowIfError(
+        Native.JsCreateExternalObjectWithPrototype(data, finalizeCallback, prototype, out JavaScriptValue obj)
+      );
+      return obj;
+    }
+
+    /// <summary>
     ///     Creates a new JavaScript function.
     /// </summary>
     /// <remarks>
@@ -763,6 +789,10 @@ namespace ChakraCore.API
     {
       Native.ThrowIfError(Native.JsGetProperty(this, id, out JavaScriptValue propertyReference));
       return propertyReference;
+    }
+    public JavaScriptValue GetProperty(string id)
+    {
+      return this.GetProperty(JavaScriptPropertyId.FromString(id));
     }
 
     /// <summary>
