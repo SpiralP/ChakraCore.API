@@ -1866,7 +1866,9 @@ namespace ChakraCore.API
     ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
     /// </returns>
     [DllImport(DllName)]
-    public static extern JavaScriptErrorCode JsGetAndClearExceptionWithMetadata(out JavaScriptValue metadata);
+    public static extern JavaScriptErrorCode JsGetAndClearExceptionWithMetadata(
+      out JavaScriptValue metadata
+    );
 
     /// <summary>
     ///     Create JavascriptString variable from ASCII or Utf8 string
@@ -1886,7 +1888,11 @@ namespace ChakraCore.API
     ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
     /// </returns>
     [DllImport(DllName)]
-    public static extern JavaScriptErrorCode JsCreateString(string content, UIntPtr length, out JavaScriptValue value);
+    public static extern JavaScriptErrorCode JsCreateString(
+      string content,
+      UIntPtr length,
+      out JavaScriptValue value
+    );
 
     /// <summary>
     ///     Create JavascriptString variable from Utf16 string
@@ -1906,7 +1912,11 @@ namespace ChakraCore.API
     ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
     /// </returns>
     [DllImport(DllName, CharSet = CharSet.Unicode)]
-    public static extern JavaScriptErrorCode JsCreateStringUtf16(string content, UIntPtr length, out JavaScriptValue value);
+    public static extern JavaScriptErrorCode JsCreateStringUtf16(
+      string content,
+      UIntPtr length,
+      out JavaScriptValue value
+    );
 
     /// <summary>
     ///     Write JavascriptString value into C string buffer (Utf8)
@@ -2123,7 +2133,11 @@ namespace ChakraCore.API
     ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
     /// </returns>
     [DllImport(DllName)]
-    public static extern JavaScriptErrorCode JsSerialize(JavaScriptValue script, out JavaScriptValue buffer, JavaScriptParseScriptAttributes parseAttributes);
+    public static extern JavaScriptErrorCode JsSerialize(
+      JavaScriptValue script,
+      out JavaScriptValue buffer,
+      JavaScriptParseScriptAttributes parseAttributes
+    );
 
     /// <summary>
     ///     Parses a serialized script and returns a function representing the script.

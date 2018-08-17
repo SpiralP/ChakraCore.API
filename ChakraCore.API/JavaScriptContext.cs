@@ -339,29 +339,42 @@ namespace ChakraCore.API
     ///     Executes a script.
     /// </summary>
     /// <remarks>
-    ///     Requires an active script context.
+    ///     <para>
+    ///         Requires an active script context.
+    ///     </para>
+    ///     <para>
+    ///         Script source can be either JavascriptString or JavascriptExternalArrayBuffer.
+    ///         In case it is an ExternalArrayBuffer, and the encoding of the buffer is Utf16,
+    ///         JsParseScriptAttributeArrayBufferIsUtf16Encoded is expected on parseAttributes.
+    ///     </para>
+    ///     <para>
+    ///         Use JavascriptExternalArrayBuffer with Utf8/ASCII script source
+    ///         for better performance and smaller memory footprint.
+    ///     </para>
     /// </remarks>
     /// <param name="script">The script to run.</param>
     /// <param name="sourceContext">
-    ///     A cookie identifying the script that can be used by script contexts that have debugging enabled.
+    ///     A cookie identifying the script that can be used by debuggable script contexts.
     /// </param>
-    /// <param name="sourceName">The location the script came from.</param>
-    /// <returns>The result of the script, if any.</returns>
+    /// <param name="sourceUrl">The location the script came from</param>
+    /// <param name="parseAttributes">Attribute mask for parsing the script</param>
+    /// <returns>
+    ///     The result of the script, if any.
+    /// </returns>
     public static JavaScriptValue RunScript(
-      string script,
+      JavaScriptValue script,
       JavaScriptSourceContext sourceContext,
-      string sourceName = "RunScript",
+      JavaScriptValue sourceUrl,
+      JavaScriptParseScriptAttributes parseAttributes,
       bool ignoreScriptError = false
     )
     {
-      JavaScriptValue scriptValue = JavaScriptValue.FromString(script);
-      JavaScriptValue name = JavaScriptValue.FromString(sourceName);
       Native.ThrowIfError(
         Native.JsRun(
-          scriptValue,
+          script,
           sourceContext,
-          name,
-          JavaScriptParseScriptAttributes.JsParseScriptAttributeNone,
+          sourceUrl,
+          parseAttributes,
           out JavaScriptValue result
         ),
         ignoreScriptError
@@ -371,17 +384,116 @@ namespace ChakraCore.API
 
     public static JavaScriptValue RunScript(
       string script,
+      JavaScriptSourceContext sourceContext,
+      string sourceName,
+      JavaScriptParseScriptAttributes parseAttributes,
+      bool ignoreScriptError = false
+    )
+    {
+      return RunScript(
+        JavaScriptValue.FromString(script),
+        sourceContext,
+        JavaScriptValue.FromString(sourceName),
+        parseAttributes,
+        ignoreScriptError
+      );
+    }
+
+    public static JavaScriptValue RunScript(
+      string script,
       string sourceName = "RunScript",
       bool ignoreScriptError = false
     )
     {
       return RunScript(
-        script,
+        JavaScriptValue.FromString(script),
         JavaScriptSourceContext.None,
-        sourceName,
+        JavaScriptValue.FromString(sourceName),
+        JavaScriptParseScriptAttributes.JsParseScriptAttributeNone,
         ignoreScriptError
       );
     }
+
+    /// <summary>
+    ///     Parses a script and returns a function representing the script.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Requires an active script context.
+    ///     </para>
+    ///     <para>
+    ///         Script source can be either JavascriptString or JavascriptExternalArrayBuffer.
+    ///         In case it is an ExternalArrayBuffer, and the encoding of the buffer is Utf16,
+    ///         JsParseScriptAttributeArrayBufferIsUtf16Encoded is expected on parseAttributes.
+    ///     </para>
+    ///     <para>
+    ///         Use JavascriptExternalArrayBuffer with Utf8/ASCII script source
+    ///         for better performance and smaller memory footprint.
+    ///     </para>
+    /// </remarks>
+    /// <param name="script">The script to run.</param>
+    /// <param name="sourceContext">
+    ///     A cookie identifying the script that can be used by debuggable script contexts.
+    /// </param>
+    /// <param name="sourceUrl">The location the script came from.</param>
+    /// <param name="parseAttributes">Attribute mask for parsing the script</param>
+    /// <returns>
+    ///     The result of the compiled script.
+    /// </returns>
+    public static JavaScriptValue ParseScript(
+      JavaScriptValue script,
+      JavaScriptSourceContext sourceContext,
+      JavaScriptValue sourceUrl,
+      JavaScriptParseScriptAttributes parseAttributes,
+      bool ignoreScriptError = false
+    )
+    {
+      Native.ThrowIfError(
+        Native.JsParse(
+          script,
+          sourceContext,
+          sourceUrl,
+          parseAttributes,
+          out JavaScriptValue result
+        ),
+        ignoreScriptError
+      );
+      return result;
+    }
+
+    public static JavaScriptValue ParseScript(
+      string script,
+      JavaScriptSourceContext sourceContext,
+      string sourceName,
+      JavaScriptParseScriptAttributes parseAttributes,
+      bool ignoreScriptError = false
+    )
+    {
+      return ParseScript(
+        JavaScriptValue.FromString(script),
+        sourceContext,
+        JavaScriptValue.FromString(sourceName),
+        parseAttributes,
+        ignoreScriptError
+      );
+    }
+
+    public static JavaScriptValue ParseScript(
+      string script,
+      string sourceName = "ParseScript",
+      bool ignoreScriptError = false
+    )
+    {
+      return ParseScript(
+        JavaScriptValue.FromString(script),
+        JavaScriptSourceContext.None,
+        JavaScriptValue.FromString(sourceName),
+        JavaScriptParseScriptAttributes.JsParseScriptAttributeNone,
+        ignoreScriptError
+      );
+    }
+
+
 
     /// <summary>
     ///     A scope automatically sets a context to current and resets the original context
