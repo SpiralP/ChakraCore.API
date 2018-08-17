@@ -406,21 +406,32 @@ namespace ChakraCore.API
     public static JavaScriptValue RunScript(
       string script,
       JavaScriptSourceContext sourceContext,
-      string sourceName = "RunScript"
+      string sourceName = "RunScript",
+      bool ignoreScriptError = false
     )
     {
       JavaScriptValue scriptValue = JavaScriptValue.FromString(script);
       JavaScriptValue name = JavaScriptValue.FromString(sourceName);
-      Native.ThrowIfError(Native.JsRun(scriptValue, sourceContext, name, JavaScriptParseScriptAttributes.JsParseScriptAttributeNone, out JavaScriptValue result));
+      Native.ThrowIfError(
+        Native.JsRun(
+        scriptValue,
+        sourceContext,
+        name,
+        JavaScriptParseScriptAttributes.JsParseScriptAttributeNone,
+        out JavaScriptValue result
+      ),
+      ignoreScriptError
+    );
       return result;
     }
 
     public static JavaScriptValue RunScript(
       string script,
-      string sourceName = "RunScript"
+      string sourceName = "RunScript",
+      bool ignoreScriptError = false
     )
     {
-      return RunScript(script, JavaScriptSourceContext.None, sourceName);
+      return RunScript(script, JavaScriptSourceContext.None, sourceName, ignoreScriptError);
     }
 
     /// <summary>

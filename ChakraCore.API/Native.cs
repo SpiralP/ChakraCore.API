@@ -80,14 +80,14 @@ namespace ChakraCore.API
             {
               if (!ignoreScriptError)
               {
-                string msg = extractErrorObject(out var errorObject);
+                string msg = getErrorMessageAndObject(out var errorObject);
                 throw new JavaScriptScriptException(error, errorObject, $"Script threw an exception. {msg}");
               }
               break;
             }
           case JavaScriptErrorCode.ScriptCompile:
             {
-              string msg = extractErrorObject(out var errorObject);
+              string msg = getErrorMessageAndObject(out var errorObject);
               throw new JavaScriptScriptException(error, errorObject, $"Compile error. {msg}");
             }
 
@@ -106,34 +106,75 @@ namespace ChakraCore.API
       }
     }
 
-    private static string extractErrorObject(out JavaScriptValue errorObject)
+    private static string getErrorMessageAndObject(out JavaScriptValue errorObject)
     {
       JavaScriptErrorCode result;
-      result = JsGetAndClearException(out errorObject);
+      result = JsGetAndClearExceptionWithMetadata(out JavaScriptValue metadata); // exception line column length source url
       if (result != JavaScriptErrorCode.NoError)
       {
-        throw new JavaScriptFatalException(result, "failed to get and clear exception");
+        throw new JavaScriptFatalException(result, "JsGetAndClearExceptionWithMetadata failed: " + result);
       }
 
-      result = JsGetProperty(errorObject, JavaScriptPropertyId.FromString("stack"), out JavaScriptValue stackValue);
-      if (result != JavaScriptErrorCode.NoError)
+      string source = metadata.GetProperty("source").ToString();
+      string url = metadata.GetProperty("url").ToString();
+      int line = metadata.GetProperty("line").ToInt32(); // 0 based
+      int column = metadata.GetProperty("column").ToInt32();
+
+      errorObject = metadata.GetProperty("exception");
+
+      JavaScriptValueType valueType = errorObject.ValueType;
+
+      string message;
+      if (valueType == JavaScriptValueType.Error)
       {
-        throw new JavaScriptFatalException(result, "failed to get error stack property");
+        JavaScriptValue stackProp = errorObject.GetProperty("stack"); // can be undefined sometimes (Compile error/syntax)
+
+        if (stackProp.ValueType == JavaScriptValueType.String)
+        {
+          // stack includes message, if it exists
+          string errorStack = stackProp.ToString();
+          message = errorStack;
+        }
+        else
+        {
+          string errorMessage = errorObject.GetProperty("message").ToString();
+          message = $"{errorMessage}\n   at {url}:{line + 1}:{column + 1}";
+        }
+      }
+      else
+      { // something that isn't Error
+        string toString = errorObject.ConvertToString().ToString();
+        message = $"{toString} ({valueType})\n   at {url}:{line + 1}:{column + 1}";
       }
 
-      result = JsStringToPointer(stackValue, out IntPtr stack, out UIntPtr stackLength);
-      if (result != JavaScriptErrorCode.NoError)
-      {
-        throw new JavaScriptFatalException(result, "failed to convert error stack to pointer");
+
+      message = $"\n{message}\n";
+
+      if (source.Length < column)
+      { // something weird happened and we couldn't obtain the full source line
+        return message;
       }
 
-      return Marshal.PtrToStringUni(stack);
+      const int charsOnEachSide = 30;
+
+      int index = Math.Min(
+        Math.Max(0, column - charsOnEachSide),
+        source.Length
+      );
+
+      source = source.Substring(
+        index,
+        Math.Min(charsOnEachSide * 2 + 1, source.Length - index)
+      );
+
+      string arrow = new String(' ', (column - index) + line.ToString().Length + 2) + "^"; // repeat space char
+      return message + $"{line}| {source}\n{arrow}\n";
     }
 
 
     const string DllName = "ChakraCore";
 
-    // ChakraCommon.h
+    #region ChakraCommon.h
 
     /// <summary>
     ///     Creates a new runtime.
@@ -1623,8 +1664,10 @@ namespace ChakraCore.API
     [DllImport(DllName)]
     public static extern JavaScriptErrorCode JsSetPromiseContinuationCallback(JavaScriptPromiseContinuationCallback promiseContinuationCallback, IntPtr callbackState);
 
+    #endregion // ChakraCommon.h
 
-    // ChakraCore.h
+
+    #region ChakraCore.h
 
     /// <summary>
     ///     Creates a new enhanced JavaScript function.
@@ -2685,8 +2728,10 @@ namespace ChakraCore.API
       out JavaScriptValue result
     );
 
+    #endregion // ChakraCore.h
 
-    // ChakraCommonWindows.h
+
+    #region ChakraCommonWindows.h
 
     /// <summary>
     ///     Parses a script and returns a function representing the script.
@@ -3052,8 +3097,10 @@ namespace ChakraCore.API
       out UIntPtr stringLength
     );
 
+    #endregion // ChakraCommonWindows.h
 
-    // ChakraDebug.h
+
+    #region ChakraDebug.h
 
     /// <summary>
     ///     Starts debugging in the given runtime.
@@ -3517,7 +3564,7 @@ namespace ChakraCore.API
     );
 
 
-    // Time Travel Debugging
+    #region Time Travel Debugging
 
     /// <summary>
     ///     TTD API -- may change in future versions:
@@ -3872,5 +3919,9 @@ namespace ChakraCore.API
       string uri,
       UIntPtr uriLength
     );
+
+    #endregion // Time Travel Debugging
+
+    #endregion // ChakraDebug.h
   }
 }
