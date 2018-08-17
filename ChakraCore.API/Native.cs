@@ -1663,7 +1663,11 @@ namespace ChakraCore.API
     ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
     /// </returns>
     [DllImport(DllName)]
-    public static extern JavaScriptErrorCode JsInitializeModuleRecord(JavaScriptModuleRecord parent, JavaScriptValue name, out JavaScriptModuleRecord result);
+    public static extern JavaScriptErrorCode JsInitializeModuleRecord(
+      JavaScriptModuleRecord parent,
+      JavaScriptValue name,
+      out JavaScriptModuleRecord result
+    );
 
     /// <summary>
     ///     Parse the source for an ES module
@@ -1684,7 +1688,14 @@ namespace ChakraCore.API
     ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
     /// </returns>
     [DllImport(DllName)]
-    public static extern JavaScriptErrorCode JsParseModuleSource(JavaScriptModuleRecord moduel, JavaScriptSourceContext sourceContext, byte[] script, uint scriptLength, JavaScriptParseModuleSourceFlags flags, out JavaScriptValue parseException);
+    public static extern JavaScriptErrorCode JsParseModuleSource(
+      JavaScriptModuleRecord moduel,
+      JavaScriptSourceContext sourceContext,
+      byte[] script,
+      uint scriptLength,
+      JavaScriptParseModuleSourceFlags flags,
+      out JavaScriptValue parseException
+    );
 
     /// <summary>
     ///     Execute module code.
@@ -1702,7 +1713,10 @@ namespace ChakraCore.API
     ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
     /// </returns>
     [DllImport(DllName)]
-    public static extern JavaScriptErrorCode JsModuleEvaluation(JavaScriptModuleRecord moduel, out JavaScriptValue result);
+    public static extern JavaScriptErrorCode JsModuleEvaluation(
+      JavaScriptModuleRecord requestModule,
+      out JavaScriptValue result
+    );
 
     /// <summary>
     ///     Set host info for the specified module.

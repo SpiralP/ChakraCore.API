@@ -868,7 +868,26 @@ namespace ChakraCore.API
     /// <returns>Whether the property was defined.</returns>
     public bool DefineProperty(JavaScriptPropertyId propertyId, JavaScriptValue propertyDescriptor)
     {
-      Native.ThrowIfError(Native.JsDefineProperty(this, propertyId, propertyDescriptor, out bool result));
+      Native.ThrowIfError(
+        Native.JsDefineProperty(
+          this,
+          propertyId,
+          propertyDescriptor,
+          out bool result
+        )
+      );
+      return result;
+    }
+    public bool DefineProperty(string id, JavaScriptValue propertyDescriptor)
+    {
+      Native.ThrowIfError(
+        Native.JsDefineProperty(
+          this,
+          JavaScriptPropertyId.FromString(id),
+          propertyDescriptor,
+          out bool result
+        )
+      );
       return result;
     }
 
