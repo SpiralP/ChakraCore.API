@@ -229,30 +229,6 @@ namespace ChakraCore.API
     }
 
 
-    //
-
-    public static string GetLastError()
-    {
-      if (Native.JsGetAndClearException(out JavaScriptValue exception) != JavaScriptErrorCode.NoError)
-        return "failed to get and clear exception";
-
-      if (
-        Native.JsGetPropertyIdFromName("message", out JavaScriptPropertyId messageName) !=
-        JavaScriptErrorCode.NoError
-      )
-        return "failed to get error message id";
-
-      if (Native.JsGetProperty(exception, messageName, out JavaScriptValue messageValue)
-          != JavaScriptErrorCode.NoError)
-        return "failed to get error message";
-
-      if (Native.JsStringToPointer(messageValue, out IntPtr message, out UIntPtr length) != JavaScriptErrorCode.NoError)
-        return "failed to convert error message";
-
-      return Marshal.PtrToStringUni(message);
-    }
-
-
     /// <summary>
     ///     Determines whether the runtime of the current context is in an exception state.
     /// </summary>
@@ -331,20 +307,18 @@ namespace ChakraCore.API
 
 
 
-    // the rest
-
     /// <summary>
     ///     Tells the runtime to do any idle processing it need to do.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///     If idle processing has been enabled for the current runtime, calling <c>Idle</c> will
+    ///     If idle processing has been enabled for the current runtime, calling <c>JsIdle</c> will
     ///     inform the current runtime that the host is idle and that the runtime can perform
     ///     memory cleanup tasks.
     ///     </para>
     ///     <para>
-    ///     <c>Idle</c> will also return the number of system ticks until there will be more idle work
-    ///     for the runtime to do. Calling <c>Idle</c> before this number of ticks has passed will do
+    ///     <c>JsIdle</c> can also return the number of system ticks until there will be more idle work
+    ///     for the runtime to do. Calling <c>JsIdle</c> before this number of ticks has passed will do
     ///     no work.
     ///     </para>
     ///     <para>
@@ -357,38 +331,8 @@ namespace ChakraCore.API
     /// </returns>
     public static uint Idle()
     {
-      Native.ThrowIfError(Native.JsIdle(out uint ticks));
-      return ticks;
-    }
-
-    /// <summary>
-    ///     Parses a script and returns a <c>Function</c> representing the script.
-    /// </summary>
-    /// <remarks>
-    ///     Requires an active script context.
-    /// </remarks>
-    /// <param name="script">The script to parse.</param>
-    /// <param name="sourceContext">
-    ///     A cookie identifying the script that can be used by script contexts that have debugging enabled.
-    /// </param>
-    /// <param name="sourceName">The location the script came from.</param>
-    /// <returns>A <c>Function</c> representing the script code.</returns>
-    public static JavaScriptValue ParseScript(
-      string script,
-      JavaScriptSourceContext sourceContext,
-      string sourceName = "ParseScript"
-    )
-    {
-      Native.ThrowIfError(Native.JsParseScript(script, sourceContext, sourceName, out JavaScriptValue result));
-      return result;
-    }
-
-    public static JavaScriptValue ParseScript(
-      string script,
-      string sourceName = "ParseScript"
-    )
-    {
-      return ParseScript(script, JavaScriptSourceContext.None, sourceName);
+      Native.ThrowIfError(Native.JsIdle(out uint nextIdleTick));
+      return nextIdleTick;
     }
 
     /// <summary>
@@ -414,14 +358,14 @@ namespace ChakraCore.API
       JavaScriptValue name = JavaScriptValue.FromString(sourceName);
       Native.ThrowIfError(
         Native.JsRun(
-        scriptValue,
-        sourceContext,
-        name,
-        JavaScriptParseScriptAttributes.JsParseScriptAttributeNone,
-        out JavaScriptValue result
-      ),
-      ignoreScriptError
-    );
+          scriptValue,
+          sourceContext,
+          name,
+          JavaScriptParseScriptAttributes.JsParseScriptAttributeNone,
+          out JavaScriptValue result
+        ),
+        ignoreScriptError
+      );
       return result;
     }
 
@@ -431,7 +375,12 @@ namespace ChakraCore.API
       bool ignoreScriptError = false
     )
     {
-      return RunScript(script, JavaScriptSourceContext.None, sourceName, ignoreScriptError);
+      return RunScript(
+        script,
+        JavaScriptSourceContext.None,
+        sourceName,
+        ignoreScriptError
+      );
     }
 
     /// <summary>
@@ -457,8 +406,8 @@ namespace ChakraCore.API
       public Scope(JavaScriptContext context)
       {
         disposed = false;
-        previousContext = Current;
-        Current = context;
+        previousContext = JavaScriptContext.Current;
+        JavaScriptContext.Current = context;
       }
 
       /// <summary>
@@ -466,12 +415,9 @@ namespace ChakraCore.API
       /// </summary>
       public void Dispose()
       {
-        if (disposed)
-        {
-          return;
-        }
+        if (disposed) return;
 
-        Current = previousContext;
+        JavaScriptContext.Current = previousContext;
         disposed = true;
       }
     }

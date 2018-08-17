@@ -118,7 +118,7 @@ namespace ChakraCore.API
       string source = metadata.GetProperty("source").ToString();
       string url = metadata.GetProperty("url").ToString();
       int line = metadata.GetProperty("line").ToInt32(); // 0 based
-      int column = metadata.GetProperty("column").ToInt32();
+      int column = metadata.GetProperty("column").ToInt32(); // 0 based
 
       errorObject = metadata.GetProperty("exception");
 
@@ -167,8 +167,8 @@ namespace ChakraCore.API
         Math.Min(charsOnEachSide * 2 + 1, source.Length - index)
       );
 
-      string arrow = new String(' ', (column - index) + line.ToString().Length + 2) + "^"; // repeat space char
-      return message + $"{line}| {source}\n{arrow}\n";
+      string arrow = new String(' ', (column - index) + (line + 1).ToString().Length + 2) + "^"; // repeat space char
+      return message + $"{line + 1}| {source}\n{arrow}\n";
     }
 
 
@@ -2737,6 +2737,7 @@ namespace ChakraCore.API
     ///     Parses a script and returns a function representing the script.
     /// </summary>
     /// <remarks>
+    ///     ### This API is Windows-only (see JsParse for cross-platform equivalent).
     ///     Requires an active script context.
     /// </remarks>
     /// <param name="script">The script to parse.</param>
@@ -2760,6 +2761,7 @@ namespace ChakraCore.API
     ///     Parses a script and returns a function representing the script.
     /// </summary>
     /// <remarks>
+    ///     ### This API is Windows-only (see JsParse for cross-platform equivalent).
     ///     Requires an active script context.
     /// </remarks>
     /// <param name="script">The script to parse.</param>
@@ -2785,6 +2787,7 @@ namespace ChakraCore.API
     ///     Executes a script.
     /// </summary>
     /// <remarks>
+    ///     ### This API is Windows-only (see JsRun for cross-platform equivalent).
     ///     Requires an active script context.
     /// </remarks>
     /// <param name="script">The script to run.</param>
@@ -2808,6 +2811,7 @@ namespace ChakraCore.API
     ///     Executes a module.
     /// </summary>
     /// <remarks>
+    ///     ### This API is Windows-only.
     ///     Requires an active script context.
     /// </remarks>
     /// <param name="script">The module script to parse and execute.</param>
@@ -2856,7 +2860,7 @@ namespace ChakraCore.API
     public static extern JavaScriptErrorCode JsSerializeScript(
       string script,
       byte[] buffer,
-      ref ulong bufferSize
+      ref ulong bufferSize // _Inout_ unsigned int *bufferSize
     );
 
     /// <summary>
@@ -2864,6 +2868,9 @@ namespace ChakraCore.API
     ///     Provides the ability to lazy load the script source only if/when it is needed.
     /// </summary>
     /// <remarks>
+    ///     <para>
+    ///     ### This API is Windows-only (see JsParseSerialized for cross-platform equivalent).
+    ///     </para>
     ///     <para>
     ///     Requires an active script context.
     ///     </para>
@@ -2900,6 +2907,9 @@ namespace ChakraCore.API
     ///     Provides the ability to lazy load the script source only if/when it is needed.
     /// </summary>
     /// <remarks>
+    ///     <para>
+    ///     ### This API is Windows-only (see JsRunSerialized for cross-platform equivalent).
+    ///     </para>
     ///     <para>
     ///     Requires an active script context.
     ///     </para>
@@ -3008,6 +3018,9 @@ namespace ChakraCore.API
     /// </summary>
     /// <remarks>
     ///     <para>
+    ///     ### This API is Windows-only (see JsCreatePropertyId for cross-platform equivalent).
+    ///     </para>
+    ///     <para>
     ///     Property IDs are specific to a context and cannot be used across contexts.
     ///     </para>
     ///     <para>
@@ -3032,6 +3045,9 @@ namespace ChakraCore.API
     /// </summary>
     /// <remarks>
     ///     <para>
+    ///     ### This API is Windows-only (see JsCopyPropertyId for cross-platform equivalent).
+    ///     </para>
+    ///     <para>
     ///     Requires an active script context.
     ///     </para>
     ///     <para>
@@ -3054,6 +3070,9 @@ namespace ChakraCore.API
     ///     Creates a string value from a string pointer.
     /// </summary>
     /// <remarks>
+    ///     <para>
+    ///     ### This API is Windows-only (see JsCreateString/JsCreateStringUtf16 for cross-platform equivalent).
+    ///     </para>
     ///     Requires an active script context.
     /// </remarks>
     /// <param name="stringValue">The string pointer to convert to a string value.</param>
@@ -3073,6 +3092,9 @@ namespace ChakraCore.API
     ///     Retrieves the string pointer of a string value.
     /// </summary>
     /// <remarks>
+    ///     <para>
+    ///     ### This API is Windows-only (see JsCopyString/JsCopyStringUtf16 for cross-platform equivalent).
+    ///     </para>
     ///     <para>
     ///     This function retrieves the string pointer of a string value. It will fail with
     ///     <c>JsErrorInvalidArgument</c> if the type of the value is not string. The lifetime
