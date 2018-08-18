@@ -494,6 +494,10 @@ namespace ChakraCore.API
     }
 
 
+    public Scope getScope()
+    {
+      return new Scope(this);
+    }
 
     /// <summary>
     ///     A scope automatically sets a context to current and resets the original context
@@ -518,8 +522,16 @@ namespace ChakraCore.API
       public Scope(JavaScriptContext context)
       {
         disposed = false;
+
         previousContext = JavaScriptContext.Current;
-        JavaScriptContext.Current = context;
+        if (previousContext == context)
+        {
+          disposed = true; // don't need to set current, or reset to previous context, someone else will for us
+        }
+        else
+        {
+          JavaScriptContext.Current = context;
+        }
       }
 
       /// <summary>
