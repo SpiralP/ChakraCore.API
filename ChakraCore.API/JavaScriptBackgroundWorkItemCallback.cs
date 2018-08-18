@@ -1,7 +1,6 @@
 ﻿using System;
 
-namespace ChakraCore.API
-{
+namespace ChakraCore.API {
   /// <summary>
   ///     A background work item callback.
   /// </summary>
@@ -10,5 +9,7 @@ namespace ChakraCore.API
   ///     invoke the work item callback on the background thread of its choice.
   /// </remarks>
   /// <param name="callbackState">Data argument passed to the thread service.</param>
-  public delegate void JavaScriptBackgroundWorkItemCallback(IntPtr callbackData);
+  public delegate void JavaScriptBackgroundWorkItemCallback(
+    IntPtr callbackData
+  );
 }

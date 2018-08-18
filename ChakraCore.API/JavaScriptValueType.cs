@@ -1,10 +1,8 @@
-﻿namespace ChakraCore.API
-{
+﻿namespace ChakraCore.API {
   /// <summary>
   ///     The JavaScript type of a JavaScriptValue.
   /// </summary>
-  public enum JavaScriptValueType
-  {
+  public enum JavaScriptValueType {
     /// <summary>
     ///     The value is the <c>undefined</c> value.
     /// </summary>

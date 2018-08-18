@@ -1,7 +1,6 @@
 ﻿using System;
 
-namespace ChakraCore.API
-{
+namespace ChakraCore.API {
   /// <summary>
   ///     The context passed into application callback, JsProjectionEnqueueCallback, from Jsrt and
   ///     then passed back to Jsrt in the provided callback, JsProjectionCallback, by the application
@@ -10,8 +9,7 @@ namespace ChakraCore.API
   /// <remarks>
   ///     Requires calling JsSetProjectionEnqueueCallback to receive callbacks.
   /// </remarks>
-  public struct JavaScriptProjectionCallbackContext
-  {
+  public struct JavaScriptProjectionCallbackContext {
     /// <summary>
     /// The reference.
     /// </summary>
@@ -21,16 +19,14 @@ namespace ChakraCore.API
     ///     Initializes a new instance of the <see cref="JavaScriptProjectionCallbackContext"/> struct.
     /// </summary>
     /// <param name="reference">The reference.</param>
-    private JavaScriptProjectionCallbackContext(IntPtr reference)
-    {
+    private JavaScriptProjectionCallbackContext(IntPtr reference) {
       this.reference = reference;
     }
 
     /// <summary>
     ///     Gets an invalid ID.
     /// </summary>
-    public static JavaScriptProjectionCallbackContext Invalid
-    {
+    public static JavaScriptProjectionCallbackContext Invalid {
       get { return new JavaScriptProjectionCallbackContext(IntPtr.Zero); }
     }
   }

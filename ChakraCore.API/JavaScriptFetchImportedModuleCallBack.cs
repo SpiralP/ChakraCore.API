@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ChakraCore.API
-{
+namespace ChakraCore.API {
   /// <summary>
   ///     User implemented callback to fetch additional imported modules in ES modules.
   /// </summary>
@@ -27,5 +22,9 @@ namespace ChakraCore.API
   /// <returns>
   ///     Returns a <c>JsNoError</c> if the operation succeeded an error code otherwise.
   /// </returns>
-  public delegate JavaScriptErrorCode JavaScriptFetchImportedModuleCallBack(JavaScriptModuleRecord referencingModule, JavaScriptValue specifier, out JavaScriptModuleRecord dependentModuleRecord);
+  public delegate JavaScriptErrorCode JavaScriptFetchImportedModuleCallBack(
+    JavaScriptModuleRecord referencingModule,
+    JavaScriptValue specifier,
+    out JavaScriptModuleRecord dependentModuleRecord
+  );
 }

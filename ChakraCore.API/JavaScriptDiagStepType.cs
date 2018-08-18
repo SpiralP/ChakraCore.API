@@ -1,10 +1,8 @@
-﻿namespace ChakraCore.API
-{
+﻿namespace ChakraCore.API {
   /// <summary>
   ///     Stepping types.
   /// </summary>
-  public enum JavaScriptDiagStepType
-  {
+  public enum JavaScriptDiagStepType {
     /// <summary>
     ///     Perform a step operation to next statement.
     /// </summary>

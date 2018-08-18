@@ -1,7 +1,6 @@
 ﻿using System;
 
-namespace ChakraCore.API
-{
+namespace ChakraCore.API {
   /// <summary>
   ///     A callback called before collecting an object.
   /// </summary>
@@ -10,5 +9,8 @@ namespace ChakraCore.API
   /// </remarks>
   /// <param name="ref">The object to be collected.</param>
   /// <param name="callbackState">The state passed to <c>JsSetObjectBeforeCollectCallback</c>.</param>
-  public delegate void JavaScriptObjectBeforeCollectCallback(JavaScriptValue reference, IntPtr callbackState);
+  public delegate void JavaScriptObjectBeforeCollectCallback(
+    JavaScriptValue reference,
+    IntPtr callbackState
+  );
 }

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace ChakraCore.API
-{
+namespace ChakraCore.API {
   /// <summary>
   ///     A property identifier.
   /// </summary>
@@ -10,8 +9,7 @@ namespace ChakraCore.API
   ///     Property identifiers are used to refer to properties of JavaScript objects instead of using
   ///     strings.
   /// </remarks>
-  public struct JavaScriptPropertyId : IEquatable<JavaScriptPropertyId>
-  {
+  public struct JavaScriptPropertyId : IEquatable<JavaScriptPropertyId> {
     /// <summary>
     /// The id.
     /// </summary>
@@ -21,16 +19,14 @@ namespace ChakraCore.API
     ///     Initializes a new instance of the <see cref="JavaScriptPropertyId"/> struct.
     /// </summary>
     /// <param name="id">The ID.</param>
-    internal JavaScriptPropertyId(IntPtr id)
-    {
+    internal JavaScriptPropertyId(IntPtr id) {
       this.id = id;
     }
 
     /// <summary>
     ///     Gets an invalid ID.
     /// </summary>
-    public static JavaScriptPropertyId Invalid
-    {
+    public static JavaScriptPropertyId Invalid {
       get { return new JavaScriptPropertyId(IntPtr.Zero); }
     }
 
@@ -42,20 +38,18 @@ namespace ChakraCore.API
     ///     Requires an active script context.
     ///     </para>
     /// </remarks>
-    public string Name
-    {
-      get
-      {
+    public string Name {
+      get {
         Native.ThrowIfError(
           Native.JsCopyPropertyId(
             this,
             null,
-            (UIntPtr)0,
+            (UIntPtr) 0,
             out UIntPtr bufferSize
           )
         );
 
-        StringBuilder buffer = new StringBuilder((int)bufferSize);
+        StringBuilder buffer = new StringBuilder((int) bufferSize);
         Native.ThrowIfError(
           Native.JsCopyPropertyId(
             this,
@@ -84,12 +78,11 @@ namespace ChakraCore.API
     ///     The name of the property ID to get or create. The name may consist of only digits.
     /// </param>
     /// <returns>The property ID in this runtime for the given name.</returns>
-    public static JavaScriptPropertyId FromString(string name)
-    {
+    public static JavaScriptPropertyId FromString(string name) {
       Native.ThrowIfError(
         Native.JsCreatePropertyId(
           name,
-          (UIntPtr)Encoding.UTF8.GetByteCount(name),
+          (UIntPtr) Encoding.UTF8.GetByteCount(name),
           out JavaScriptPropertyId id
         )
       );
@@ -102,8 +95,7 @@ namespace ChakraCore.API
     /// <param name="left">The first property ID to compare.</param>
     /// <param name="right">The second property ID to compare.</param>
     /// <returns>Whether the two property IDs are the same.</returns>
-    public static bool operator ==(JavaScriptPropertyId left, JavaScriptPropertyId right)
-    {
+    public static bool operator ==(JavaScriptPropertyId left, JavaScriptPropertyId right) {
       return left.Equals(right);
     }
 
@@ -113,8 +105,7 @@ namespace ChakraCore.API
     /// <param name="left">The first property ID to compare.</param>
     /// <param name="right">The second property ID to compare.</param>
     /// <returns>Whether the two property IDs are not the same.</returns>
-    public static bool operator !=(JavaScriptPropertyId left, JavaScriptPropertyId right)
-    {
+    public static bool operator !=(JavaScriptPropertyId left, JavaScriptPropertyId right) {
       return !left.Equals(right);
     }
 
@@ -123,8 +114,7 @@ namespace ChakraCore.API
     /// </summary>
     /// <param name="other">The other property ID to compare.</param>
     /// <returns>Whether the two property IDs are the same.</returns>
-    public bool Equals(JavaScriptPropertyId other)
-    {
+    public bool Equals(JavaScriptPropertyId other) {
       return this.id == other.id;
     }
 
@@ -133,22 +123,19 @@ namespace ChakraCore.API
     /// </summary>
     /// <param name="obj">The other property ID to compare.</param>
     /// <returns>Whether the two property IDs are the same.</returns>
-    public override bool Equals(object obj)
-    {
-      if (ReferenceEquals(null, obj))
-      {
+    public override bool Equals(object obj) {
+      if (ReferenceEquals(null, obj)) {
         return false;
       }
 
-      return obj is JavaScriptPropertyId && Equals((JavaScriptPropertyId)obj);
+      return obj is JavaScriptPropertyId && Equals((JavaScriptPropertyId) obj);
     }
 
     /// <summary>
     ///     The hash code.
     /// </summary>
     /// <returns>The hash code of the property ID.</returns>
-    public override int GetHashCode()
-    {
+    public override int GetHashCode() {
       return id.ToInt32();
     }
 
@@ -156,8 +143,7 @@ namespace ChakraCore.API
     ///     Converts the property ID to a string.
     /// </summary>
     /// <returns>The name of the property ID.</returns>
-    public override string ToString()
-    {
+    public override string ToString() {
       return Name;
     }
   }

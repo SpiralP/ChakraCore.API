@@ -1,7 +1,4 @@
-using System;
-
-namespace ChakraCore.API
-{
+namespace ChakraCore.API {
   /// <summary>
   ///     Called by the runtime to load the source code of the serialized script.
   /// </summary>
@@ -17,5 +14,9 @@ namespace ChakraCore.API
   ///     The callback can be used by hosts to prepare for garbage collection.
   ///     For example, by releasing unnecessary references on Chakra objects.
   /// </remarks>
-  public delegate bool JavaScriptSerializedLoadScriptCallback(JavaScriptSourceContext sourceContext, out JavaScriptValue value, out JavaScriptParseScriptAttributes parseAttributes);
+  public delegate bool JavaScriptSerializedLoadScriptCallback(
+    JavaScriptSourceContext sourceContext,
+    out JavaScriptValue value,
+    out JavaScriptParseScriptAttributes parseAttributes
+  );
 }

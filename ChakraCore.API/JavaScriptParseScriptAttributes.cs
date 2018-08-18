@@ -1,10 +1,8 @@
-﻿namespace ChakraCore.API
-{
+﻿namespace ChakraCore.API {
   /// <summary>
   ///     Attribute mask for JsParseScriptWithAttributes
   /// </summary>
-  public enum JavaScriptParseScriptAttributes : byte
-  {
+  public enum JavaScriptParseScriptAttributes : byte {
     /// <summary>
     ///     Default attribute
     /// </summary>

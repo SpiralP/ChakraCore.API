@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace ChakraCore.API
-{
+namespace ChakraCore.API {
   /// <summary>
   ///     Attributes of a runtime.
   /// </summary>
   [Flags]
-  public enum JavaScriptRuntimeAttributes
-  {
+  public enum JavaScriptRuntimeAttributes {
     /// <summary>
     ///     No special attributes.
     /// </summary>

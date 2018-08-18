@@ -1,10 +1,8 @@
-﻿namespace ChakraCore.API
-{
+﻿namespace ChakraCore.API {
   /// <summary>
   ///     Flags for parsing a module.
   /// </summary>
-  public enum JavaScriptParseModuleSourceFlags
-  {
+  public enum JavaScriptParseModuleSourceFlags {
     /// <summary>
     ///     Module source is UTF16.
     /// </summary>

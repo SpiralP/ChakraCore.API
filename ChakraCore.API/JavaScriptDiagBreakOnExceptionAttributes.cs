@@ -1,10 +1,8 @@
-﻿namespace ChakraCore.API
-{
+﻿namespace ChakraCore.API {
   /// <summary>
   ///     Break on Exception attributes.
   /// </summary>
-  public enum JavaScriptDiagBreakOnExceptionAttributes
-  {
+  public enum JavaScriptDiagBreakOnExceptionAttributes {
     /// <summary>
     ///     Don't break on any exception.
     /// </summary>

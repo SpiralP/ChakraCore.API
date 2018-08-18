@@ -1,8 +1,6 @@
 using System;
-using System.Runtime.InteropServices;
 
-namespace ChakraCore.API
-{
+namespace ChakraCore.API {
   /// <summary>
   ///     A script context.
   /// </summary>
@@ -17,8 +15,7 @@ namespace ChakraCore.API
   ///     that explicitly in their documentation.
   ///     </para>
   /// </remarks>
-  public struct JavaScriptContext
-  {
+  public struct JavaScriptContext {
     /// <summary>
     ///     The reference.
     /// </summary>
@@ -28,50 +25,40 @@ namespace ChakraCore.API
     ///     Initializes a new instance of the <see cref="JavaScriptContext"/> struct.
     /// </summary>
     /// <param name="reference">The reference.</param>
-    internal JavaScriptContext(IntPtr reference)
-    {
+    internal JavaScriptContext(IntPtr reference) {
       this.reference = reference;
     }
 
     /// <summary>
     ///     Gets an invalid context.
     /// </summary>
-    public static JavaScriptContext Invalid
-    {
+    public static JavaScriptContext Invalid {
       get { return new JavaScriptContext(IntPtr.Zero); }
     }
 
     /// <summary>
     ///     Gets a value indicating whether the context is a valid context or not.
     /// </summary>
-    public bool IsValid
-    {
+    public bool IsValid {
       get { return reference != IntPtr.Zero; }
     }
 
-    public static bool operator ==(JavaScriptContext lhs, JavaScriptContext rhs)
-    {
+    public static bool operator ==(JavaScriptContext lhs, JavaScriptContext rhs) {
       return lhs.reference == rhs.reference;
     }
 
-    public static bool operator !=(JavaScriptContext lhs, JavaScriptContext rhs)
-    {
+    public static bool operator !=(JavaScriptContext lhs, JavaScriptContext rhs) {
       return lhs.reference != rhs.reference;
     }
-    public override bool Equals(object obj)
-    {
-      if (obj is JavaScriptContext)
-      {
-        return (this == (JavaScriptContext)obj);
-      }
-      else
-      {
+    public override bool Equals(object obj) {
+      if (obj is JavaScriptContext) {
+        return (this == (JavaScriptContext) obj);
+      } else {
         return false;
       }
     }
 
-    public override int GetHashCode()
-    {
+    public override int GetHashCode() {
       return reference.GetHashCode();
     }
 
@@ -87,8 +74,7 @@ namespace ChakraCore.API
     /// <returns>
     ///     The object's new reference count.
     /// </returns>
-    public uint AddRef()
-    {
+    public uint AddRef() {
       Native.ThrowIfError(Native.JsAddRef(this, out uint count));
       return count;
     }
@@ -102,8 +88,7 @@ namespace ChakraCore.API
     /// <returns>
     ///     The object's new reference count.
     /// </returns>
-    public uint Release()
-    {
+    public uint Release() {
       Native.ThrowIfError(Native.JsRelease(this, out uint count));
       return count;
     }
@@ -119,8 +104,7 @@ namespace ChakraCore.API
     /// <returns>
     ///     The created script context.
     /// </returns>
-    public static JavaScriptContext CreateContext(JavaScriptRuntime runtime)
-    {
+    public static JavaScriptContext CreateContext(JavaScriptRuntime runtime) {
       Native.ThrowIfError(Native.JsCreateContext(runtime, out JavaScriptContext newContext));
       return newContext;
     }
@@ -132,16 +116,13 @@ namespace ChakraCore.API
     /// <returns>
     ///     The current script context on the thread, null if there is no current script context.
     /// </returns>
-    public static JavaScriptContext Current
-    {
-      get
-      {
+    public static JavaScriptContext Current {
+      get {
         Native.ThrowIfError(Native.JsGetCurrentContext(out JavaScriptContext reference));
         return reference;
       }
 
-      set
-      {
+      set {
         Native.ThrowIfError(Native.JsSetCurrentContext(value));
       }
     }
@@ -154,8 +135,7 @@ namespace ChakraCore.API
     /// <returns>
     ///     The context the object belongs to.
     /// </returns>
-    public static JavaScriptContext GetContextOfObject(JavaScriptValue obj)
-    {
+    public static JavaScriptContext GetContextOfObject(JavaScriptValue obj) {
       Native.ThrowIfError(Native.JsGetContextOfObject(obj, out JavaScriptContext context));
       return context;
     }
@@ -166,8 +146,7 @@ namespace ChakraCore.API
     /// <returns>
     ///     The pointer to the data where data will be returned.
     /// </returns>
-    public IntPtr GetContextData()
-    {
+    public IntPtr GetContextData() {
       Native.ThrowIfError(Native.JsGetContextData(this, out IntPtr data));
       return data;
     }
@@ -176,8 +155,7 @@ namespace ChakraCore.API
     ///     Sets the internal data of JsrtContext.
     /// </summary>
     /// <param name="data">The pointer to the data to be set.</param>
-    public void SetContextData(IntPtr data)
-    {
+    public void SetContextData(IntPtr data) {
       Native.ThrowIfError(Native.JsSetContextData(this, data));
     }
 
@@ -187,8 +165,7 @@ namespace ChakraCore.API
     /// <returns>
     ///     The runtime the context belongs to.
     /// </returns>
-    public JavaScriptRuntime GetRuntime()
-    {
+    public JavaScriptRuntime GetRuntime() {
       Native.ThrowIfError(Native.JsGetRuntime(this, out JavaScriptRuntime runtime));
       return runtime;
     }
@@ -209,8 +186,7 @@ namespace ChakraCore.API
     public static JavaScriptContext TTDCreateContext(
       JavaScriptRuntime runtimeHandle,
       bool useRuntimeTTDMode
-    )
-    {
+    ) {
       Native.ThrowIfError(Native.JsTTDCreateContext(runtimeHandle, useRuntimeTTDMode, out JavaScriptContext newContext));
       return newContext;
     }
@@ -223,8 +199,7 @@ namespace ChakraCore.API
     /// <returns>
     ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
     /// </returns>
-    public void TTDNotifyContextDestroy()
-    {
+    public void TTDNotifyContextDestroy() {
       Native.ThrowIfError(Native.JsTTDNotifyContextDestroy(this));
     }
 
@@ -251,10 +226,8 @@ namespace ChakraCore.API
     /// <returns>
     ///     Whether the runtime of the current context is in the exception state.
     /// </returns>
-    public static bool HasException
-    {
-      get
-      {
+    public static bool HasException {
+      get {
         Native.ThrowIfError(Native.JsHasException(out bool hasException));
         return hasException;
       }
@@ -279,8 +252,7 @@ namespace ChakraCore.API
     /// <returns>
     ///     The exception for the runtime of the current context.
     /// </returns>
-    public static JavaScriptValue GetAndClearException()
-    {
+    public static JavaScriptValue GetAndClearException() {
       Native.ThrowIfError(Native.JsGetAndClearException(out JavaScriptValue exception));
       return exception;
     }
@@ -300,20 +272,17 @@ namespace ChakraCore.API
     /// <param name="exception">
     ///     The JavaScript exception to set for the runtime of the current context.
     /// </param>
-    public static void SetException(JavaScriptValue exception)
-    {
+    public static void SetException(JavaScriptValue exception) {
       Native.ThrowIfError(Native.JsSetException(exception));
     }
 
-    public static void ThrowError(string message)
-    {
+    public static void ThrowError(string message) {
       JavaScriptContext.SetException(
         JavaScriptValue.CreateError(message)
       );
     }
 
-    public static void ThrowException(Exception e)
-    {
+    public static void ThrowException(Exception e) {
       ThrowError($"{e.GetType()}: {e.Message}\n{e.StackTrace}");
     }
 
@@ -339,8 +308,7 @@ namespace ChakraCore.API
     ///     The next system tick when there will be more idle work to do. Returns the
     ///     maximum number of ticks if there no upcoming idle work to do.
     /// </returns>
-    public static uint Idle()
-    {
+    public static uint Idle() {
       Native.ThrowIfError(Native.JsIdle(out uint nextIdleTick));
       return nextIdleTick;
     }
@@ -377,8 +345,7 @@ namespace ChakraCore.API
       JavaScriptValue sourceUrl,
       JavaScriptParseScriptAttributes parseAttributes,
       bool ignoreScriptError = false
-    )
-    {
+    ) {
       Native.ThrowIfError(
         Native.JsRun(
           script,
@@ -398,8 +365,7 @@ namespace ChakraCore.API
       string sourceName,
       JavaScriptParseScriptAttributes parseAttributes,
       bool ignoreScriptError = false
-    )
-    {
+    ) {
       return RunScript(
         JavaScriptValue.FromString(script),
         sourceContext,
@@ -413,8 +379,7 @@ namespace ChakraCore.API
       string script,
       string sourceName = "RunScript",
       bool ignoreScriptError = false
-    )
-    {
+    ) {
       return RunScript(
         JavaScriptValue.FromString(script),
         JavaScriptSourceContext.None,
@@ -456,8 +421,7 @@ namespace ChakraCore.API
       JavaScriptValue sourceUrl,
       JavaScriptParseScriptAttributes parseAttributes,
       bool ignoreScriptError = false
-    )
-    {
+    ) {
       Native.ThrowIfError(
         Native.JsParse(
           script,
@@ -477,8 +441,7 @@ namespace ChakraCore.API
       string sourceName,
       JavaScriptParseScriptAttributes parseAttributes,
       bool ignoreScriptError = false
-    )
-    {
+    ) {
       return ParseScript(
         JavaScriptValue.FromString(script),
         sourceContext,
@@ -492,8 +455,7 @@ namespace ChakraCore.API
       string script,
       string sourceName = "ParseScript",
       bool ignoreScriptError = false
-    )
-    {
+    ) {
       return ParseScript(
         JavaScriptValue.FromString(script),
         JavaScriptSourceContext.None,
@@ -504,8 +466,7 @@ namespace ChakraCore.API
     }
 
 
-    public Scope getScope()
-    {
+    public Scope getScope() {
       return new Scope(this);
     }
 
@@ -513,8 +474,7 @@ namespace ChakraCore.API
     ///     A scope automatically sets a context to current and resets the original context
     ///     when disposed.
     /// </summary>
-    public struct Scope : IDisposable
-    {
+    public struct Scope : IDisposable {
       /// <summary>
       ///     The previous context.
       /// </summary>
@@ -529,17 +489,13 @@ namespace ChakraCore.API
       ///     Initializes a new instance of the <see cref="Scope"/> struct.
       /// </summary>
       /// <param name="context">The context to create the scope for.</param>
-      public Scope(JavaScriptContext context)
-      {
+      public Scope(JavaScriptContext context) {
         disposed = false;
 
         previousContext = JavaScriptContext.Current;
-        if (previousContext == context)
-        {
+        if (previousContext == context) {
           disposed = true; // don't need to set current, or reset to previous context, someone else will for us
-        }
-        else
-        {
+        } else {
           JavaScriptContext.Current = context;
         }
       }
@@ -547,8 +503,7 @@ namespace ChakraCore.API
       /// <summary>
       ///     Disposes the scope and sets the previous context to current.
       /// </summary>
-      public void Dispose()
-      {
+      public void Dispose() {
         if (disposed) return;
 
         JavaScriptContext.Current = previousContext;

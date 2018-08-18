@@ -2,23 +2,18 @@
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace ChakraCore.API
-{
+namespace ChakraCore.API {
   /// <summary>
   ///     Native interfaces.
   /// </summary>
-  public static class Native
-  {
+  public static class Native {
     /// <summary>
     /// Throws if a native method returns an error code.
     /// </summary>
     /// <param name="error">The error.</param>
-    public static void ThrowIfError(JavaScriptErrorCode error, bool ignoreScriptError = false)
-    {
-      if (error != JavaScriptErrorCode.NoError)
-      {
-        switch (error)
-        {
+    public static void ThrowIfError(JavaScriptErrorCode error, bool ignoreScriptError = false) {
+      if (error != JavaScriptErrorCode.NoError) {
+        switch (error) {
           case JavaScriptErrorCode.InvalidArgument:
             throw new JavaScriptUsageException(error, "Invalid argument.");
 
@@ -78,8 +73,7 @@ namespace ChakraCore.API
 
           case JavaScriptErrorCode.ScriptException:
             {
-              if (!ignoreScriptError)
-              {
+              if (!ignoreScriptError) {
                 string msg = getErrorMessageAndObject(out JavaScriptValue errorObject);
                 throw new JavaScriptScriptException(error, errorObject, $"Script threw an exception. {msg}");
               }
@@ -106,12 +100,10 @@ namespace ChakraCore.API
       }
     }
 
-    private static string getErrorMessageAndObject(out JavaScriptValue errorObject)
-    {
+    private static string getErrorMessageAndObject(out JavaScriptValue errorObject) {
       JavaScriptErrorCode result;
       result = JsGetAndClearExceptionWithMetadata(out JavaScriptValue metadata); // exception line column length source url
-      if (result != JavaScriptErrorCode.NoError)
-      {
+      if (result != JavaScriptErrorCode.NoError) {
         throw new JavaScriptFatalException(result, "JsGetAndClearExceptionWithMetadata failed: " + result);
       }
 
@@ -125,24 +117,18 @@ namespace ChakraCore.API
       JavaScriptValueType valueType = errorObject.ValueType;
 
       string message;
-      if (valueType == JavaScriptValueType.Error)
-      {
+      if (valueType == JavaScriptValueType.Error) {
         JavaScriptValue stackProp = errorObject.GetProperty("stack"); // can be undefined sometimes (Compile error/syntax)
 
-        if (stackProp.ValueType == JavaScriptValueType.String)
-        {
+        if (stackProp.ValueType == JavaScriptValueType.String) {
           // stack includes message, if it exists
           string errorStack = stackProp.ToString();
           message = errorStack;
-        }
-        else
-        {
+        } else {
           string errorMessage = errorObject.GetProperty("message").ToString();
           message = $"{errorMessage}\n   at {url}:{line + 1}:{column + 1}";
         }
-      }
-      else
-      { // something that isn't Error
+      } else { // something that isn't Error
         string toString = errorObject.ConvertToString().ToString();
         message = $"{toString} ({valueType})\n   at {url}:{line + 1}:{column + 1}";
       }
@@ -150,8 +136,7 @@ namespace ChakraCore.API
 
       message = $"\n{message}\n";
 
-      if (source.Length < column)
-      { // something weird happened and we couldn't obtain the full source line
+      if (source.Length < column) { // something weird happened and we couldn't obtain the full source line
         return message;
       }
 
@@ -1378,7 +1363,12 @@ namespace ChakraCore.API
     ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
     /// </returns>
     [DllImport(DllName)]
-    public static extern JavaScriptErrorCode JsCallFunction(JavaScriptValue function, JavaScriptValue[] arguments, ushort argumentCount, out JavaScriptValue result);
+    public static extern JavaScriptErrorCode JsCallFunction(
+      JavaScriptValue function,
+      JavaScriptValue[] arguments,
+      ushort argumentCount,
+      out JavaScriptValue result
+    );
 
     /// <summary>
     ///     Invokes a function as a constructor.
@@ -1394,7 +1384,12 @@ namespace ChakraCore.API
     ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
     /// </returns>
     [DllImport(DllName)]
-    public static extern JavaScriptErrorCode JsConstructObject(JavaScriptValue function, JavaScriptValue[] arguments, ushort argumentCount, out JavaScriptValue result);
+    public static extern JavaScriptErrorCode JsConstructObject(
+      JavaScriptValue function,
+      JavaScriptValue[] arguments,
+      ushort argumentCount,
+      out JavaScriptValue result
+    );
 
     /// <summary>
     ///     Creates a new JavaScript function.
@@ -2558,25 +2553,6 @@ namespace ChakraCore.API
       JavaScriptValue key,
       bool useStrictRules,
       out JavaScriptValue result
-    );
-
-    /// <summary>
-    ///     Gets a property descriptor for an object's own property.
-    /// </summary>
-    /// <remarks>
-    ///     Requires an active script context.
-    /// </remarks>
-    /// <param name="obj">The object that has the property.</param>
-    /// <param name="key">The key (JavascriptString or JavascriptSymbol) to the property.</param>
-    /// <param name="propertyDescriptor">The property descriptor.</param>
-    /// <returns>
-    ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
-    /// </returns>
-    [DllImport(DllName)]
-    public static extern JavaScriptErrorCode JsObjectDeleteProperty(
-      JavaScriptValue obj,
-      JavaScriptValue key,
-      out JavaScriptValue propertyDescriptor
     );
 
     /// <summary>

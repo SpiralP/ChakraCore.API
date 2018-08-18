@@ -1,10 +1,8 @@
-﻿namespace ChakraCore.API
-{
+﻿namespace ChakraCore.API {
   /// <summary>
   ///     Allocation callback event type.
   /// </summary>
-  public enum JavaScriptMemoryEventType
-  {
+  public enum JavaScriptMemoryEventType {
     /// <summary>
     ///     Indicates a request for memory allocation.
     /// </summary>

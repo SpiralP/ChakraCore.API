@@ -1,10 +1,8 @@
-﻿namespace ChakraCore.API
-{
+﻿namespace ChakraCore.API {
   /// <summary>
   ///     The type of a typed JavaScript array.
   /// </summary>
-  public enum JavaScriptTypedArrayType
-  {
+  public enum JavaScriptTypedArrayType {
     /// <summary>
     ///     An int8 array.
     /// </summary>
@@ -49,5 +47,5 @@
     ///     A float64 array.
     /// </summary>
     Float64,
-  };
+    };
 }

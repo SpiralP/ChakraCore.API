@@ -1,7 +1,6 @@
 ﻿using System;
 
-namespace ChakraCore.API
-{
+namespace ChakraCore.API {
   /// <summary>
   ///     User implemented callback routine for memory allocation events
   /// </summary>
@@ -18,5 +17,9 @@ namespace ChakraCore.API
   ///     with the allocation. Returning false indicates the allocation request is rejected. The
   ///     return value is ignored for other allocation events.
   /// </returns>
-  public delegate bool JavaScriptMemoryAllocationCallback(IntPtr callbackState, JavaScriptMemoryEventType allocationEvent, UIntPtr allocationSize);
+  public delegate bool JavaScriptMemoryAllocationCallback(
+    IntPtr callbackState,
+    JavaScriptMemoryEventType allocationEvent,
+    UIntPtr allocationSize
+  );
 }

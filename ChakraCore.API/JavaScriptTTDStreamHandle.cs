@@ -1,12 +1,10 @@
 using System;
 
-namespace ChakraCore.API
-{
+namespace ChakraCore.API {
   /// <summary>
   ///     A handle for URI's that TTD information is written to/read from.
   /// </summary>
-  public struct JavaScriptTTDStreamHandle
-  {
+  public struct JavaScriptTTDStreamHandle {
     /// <summary>
     /// The reference.
     /// </summary>
@@ -16,16 +14,14 @@ namespace ChakraCore.API
     ///     Initializes a new instance of the <see cref="JavaScriptTTDStreamHandle"/> struct.
     /// </summary>
     /// <param name="reference">The reference.</param>
-    private JavaScriptTTDStreamHandle(IntPtr reference)
-    {
+    private JavaScriptTTDStreamHandle(IntPtr reference) {
       this.reference = reference;
     }
 
     /// <summary>
     ///     Gets an invalid ID.
     /// </summary>
-    public static JavaScriptTTDStreamHandle Invalid
-    {
+    public static JavaScriptTTDStreamHandle Invalid {
       get { return new JavaScriptTTDStreamHandle(IntPtr.Zero); }
     }
   }

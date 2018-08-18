@@ -1,10 +1,8 @@
-﻿namespace ChakraCore.API
-{
+﻿namespace ChakraCore.API {
   /// <summary>
   ///     An error code returned from a Chakra hosting API.
   /// </summary>
-  public enum JavaScriptErrorCode : uint
-  {
+  public enum JavaScriptErrorCode : uint {
     /// <summary>
     ///     Success error code.
     /// </summary>

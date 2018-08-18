@@ -1,10 +1,8 @@
-namespace ChakraCore.API
-{
+namespace ChakraCore.API {
   /// <summary>
   ///     TimeTravel move options as bit flag enum.
   /// </summary>
-  public enum JavaScriptTTDMoveMode
-  {
+  public enum JavaScriptTTDMoveMode {
     /// <summary>
     ///     Indicates no special actions needed for move.
     /// </summary>

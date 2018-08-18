@@ -1,7 +1,6 @@
 ﻿using System;
 
-namespace ChakraCore.API
-{
+namespace ChakraCore.API {
   /// <summary>
   ///     A promise continuation callback.
   /// </summary>
@@ -13,5 +12,8 @@ namespace ChakraCore.API
   /// </remarks>
   /// <param name="task">The task, represented as a JavaScript function.</param>
   /// <param name="callbackState">The data argument to be passed to the callback.</param>
-  public delegate void JavaScriptPromiseContinuationCallback(JavaScriptValue task, IntPtr callbackState);
+  public delegate void JavaScriptPromiseContinuationCallback(
+    JavaScriptValue task,
+    IntPtr callbackState
+  );
 }

@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Text;
 
-namespace ChakraCore.API
-{
+namespace ChakraCore.API {
   /// <summary>
   ///     A reference to an ES module.
   /// </summary>
   /// <remarks>
   ///     A module record represents an ES module.
   /// </remarks>
-  public struct JavaScriptModuleRecord
-  {
+  public struct JavaScriptModuleRecord {
     /// <summary>
     /// The reference.
     /// </summary>
@@ -20,60 +18,49 @@ namespace ChakraCore.API
     ///     Initializes a new instance of the <see cref="JavaScriptModuleRecord"/> struct.
     /// </summary>
     /// <param name="reference">The reference.</param>
-    private JavaScriptModuleRecord(IntPtr reference)
-    {
+    private JavaScriptModuleRecord(IntPtr reference) {
       this.reference = reference;
     }
 
     /// <summary>
     ///     Gets an invalid ID.
     /// </summary>
-    public static JavaScriptModuleRecord Invalid
-    {
+    public static JavaScriptModuleRecord Invalid {
       get { return new JavaScriptModuleRecord(IntPtr.Zero); }
     }
 
 
-    public static JavaScriptModuleRecord Create(JavaScriptModuleRecord? parent, string name)
-    {
-      if (string.IsNullOrEmpty(name))
-      {
-        name = Guid.NewGuid().ToString();//root module has no name, give it a unique name
+    public static JavaScriptModuleRecord Create(JavaScriptModuleRecord? parent, string name) {
+      if (string.IsNullOrEmpty(name)) {
+        name = Guid.NewGuid().ToString(); //root module has no name, give it a unique name
       }
       JavaScriptValue moduleName = JavaScriptValue.FromString(name);
       JavaScriptModuleRecord result;
-      if (parent.HasValue)
-      {
+      if (parent.HasValue) {
         Native.ThrowIfError(Native.JsInitializeModuleRecord(parent.Value, moduleName, out result));
-      }
-      else
-      {
+      } else {
         Native.ThrowIfError(Native.JsInitializeModuleRecord(JavaScriptModuleRecord.Invalid, moduleName, out result));
       }
 
       return result;
     }
 
-    public static void ParseScript(JavaScriptModuleRecord module, string script, JavaScriptSourceContext sourceContext)
-    {
+    public static void ParseScript(JavaScriptModuleRecord module, string script, JavaScriptSourceContext sourceContext) {
       var buffer = Encoding.UTF8.GetBytes(script);
-      uint length = (uint)buffer.Length;
+      uint length = (uint) buffer.Length;
       Native.ThrowIfError(Native.JsParseModuleSource(module, sourceContext, buffer, length, JavaScriptParseModuleSourceFlags.JsParseModuleSourceFlags_DataIsUTF8, out JavaScriptValue parseException));
-      if (parseException.IsValid)
-      {
+      if (parseException.IsValid) {
         string ex = parseException.ToString();
         throw new InvalidOperationException($"Parse script failed with error={ex}");
       }
     }
 
-    public static JavaScriptValue RunModule(JavaScriptModuleRecord module)
-    {
+    public static JavaScriptValue RunModule(JavaScriptModuleRecord module) {
       Native.ThrowIfError(Native.JsModuleEvaluation(module, out JavaScriptValue result));
       return result;
     }
 
-    public static void SetHostUrl(JavaScriptModuleRecord module, string url)
-    {
+    public static void SetHostUrl(JavaScriptModuleRecord module, string url) {
       var value = JavaScriptValue.FromString(url);
       Native.ThrowIfError(Native.JsSetModuleHostInfo(module, JavascriptModuleHostInfoKind.JsModuleHostInfo_Url, value));
     }
@@ -83,8 +70,7 @@ namespace ChakraCore.API
     /// </summary>
     /// <param name="module"></param>
     /// <param name="callback"></param>
-    public static void SetNotifyReady(JavaScriptModuleRecord module, NotifyModuleReadyCallback callback)
-    {
+    public static void SetNotifyReady(JavaScriptModuleRecord module, NotifyModuleReadyCallback callback) {
       Native.ThrowIfError(Native.JsSetModuleNotifyModuleReadyCallback(module, JavascriptModuleHostInfoKind.JsModuleHostInfo_NotifyModuleReadyCallback, callback));
     }
 
@@ -95,8 +81,7 @@ namespace ChakraCore.API
     /// </summary>
     /// <param name="module"></param>
     /// <param name="callback"></param>
-    public static void SetFetchModuleCallback(JavaScriptModuleRecord module, FetchImportedModuleCallBack callback)
-    {
+    public static void SetFetchModuleCallback(JavaScriptModuleRecord module, FetchImportedModuleCallBack callback) {
       Native.ThrowIfError(Native.JsFetchImportedModuleCallBack(module, JavascriptModuleHostInfoKind.JsModuleHostInfo_FetchImportedModuleCallback, callback));
     }
 
@@ -107,8 +92,7 @@ namespace ChakraCore.API
     /// </summary>
     /// <param name="module"></param>
     /// <param name="callback"></param>
-    public static void SetFetchModuleScriptCallback(JavaScriptModuleRecord module, FetchImportedModuleFromScriptCallBack callback)
-    {
+    public static void SetFetchModuleScriptCallback(JavaScriptModuleRecord module, FetchImportedModuleFromScriptCallBack callback) {
       Native.ThrowIfError(Native.JsFetchImportedModuleFromScriptCallBack(module, JavascriptModuleHostInfoKind.JsModuleHostInfo_FetchImportedModuleFromScriptCallback, callback));
     }
   }
@@ -137,7 +121,11 @@ namespace ChakraCore.API
   /// <returns>
   ///     Returns a <c>JsNoError</c> if the operation succeeded an error code otherwise.
   /// </returns>
-  public delegate JavaScriptErrorCode FetchImportedModuleCallBack(JavaScriptModuleRecord referencingModule, JavaScriptValue specifier, out JavaScriptModuleRecord dependentModuleRecord);
+  public delegate JavaScriptErrorCode FetchImportedModuleCallBack(
+    JavaScriptModuleRecord referencingModule,
+    JavaScriptValue specifier,
+    out JavaScriptModuleRecord dependentModuleRecord
+  );
 
   /// <summary>
   ///     User implemented callback to fetch imported modules dynamically in scripts.
@@ -160,7 +148,11 @@ namespace ChakraCore.API
   /// <returns>
   ///     Returns <c>JsNoError</c> if the operation succeeded or an error code otherwise.
   /// </returns>
-  public delegate JavaScriptErrorCode FetchImportedModuleFromScriptCallBack(JavaScriptSourceContext sourceContext, JavaScriptValue specifier, out JavaScriptModuleRecord dependentModuleRecord);
+  public delegate JavaScriptErrorCode FetchImportedModuleFromScriptCallBack(
+    JavaScriptSourceContext sourceContext,
+    JavaScriptValue specifier,
+    out JavaScriptModuleRecord dependentModuleRecord
+  );
 
   /// <summary>
   ///     User implemented callback to get notification when the module is ready.

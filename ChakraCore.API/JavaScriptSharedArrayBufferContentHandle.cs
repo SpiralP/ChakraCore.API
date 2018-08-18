@@ -1,7 +1,6 @@
 using System;
 
-namespace ChakraCore.API
-{
+namespace ChakraCore.API {
   /// <summary>
   ///     A reference to an object owned by the SharedArrayBuffer.
   /// </summary>
@@ -9,8 +8,7 @@ namespace ChakraCore.API
   ///     This represents SharedContents which is heap allocated object, it can be passed through
   ///     different runtimes to share the underlying buffer.
   /// </remarks>
-  public struct JavaScriptSharedArrayBufferContentHandle
-  {
+  public struct JavaScriptSharedArrayBufferContentHandle {
     /// <summary>
     /// The reference.
     /// </summary>
@@ -20,16 +18,14 @@ namespace ChakraCore.API
     ///     Initializes a new instance of the <see cref="JavaScriptSharedArrayBufferContentHandle"/> struct.
     /// </summary>
     /// <param name="reference">The reference.</param>
-    private JavaScriptSharedArrayBufferContentHandle(IntPtr reference)
-    {
+    private JavaScriptSharedArrayBufferContentHandle(IntPtr reference) {
       this.reference = reference;
     }
 
     /// <summary>
     ///     Gets an invalid ID.
     /// </summary>
-    public static JavaScriptSharedArrayBufferContentHandle Invalid
-    {
+    public static JavaScriptSharedArrayBufferContentHandle Invalid {
       get { return new JavaScriptSharedArrayBufferContentHandle(IntPtr.Zero); }
     }
   }

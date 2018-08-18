@@ -1,5 +1,4 @@
-namespace ChakraCore.API
-{
+namespace ChakraCore.API {
   /// <summary>
   ///     User implemented callback to fetch imported modules dynamically in scripts.
   /// </summary>
@@ -21,5 +20,9 @@ namespace ChakraCore.API
   /// <returns>
   ///     Returns <c>JsNoError</c> if the operation succeeded or an error code otherwise.
   /// </returns>
-  public delegate JavaScriptErrorCode JavaScriptFetchImportedModuleFromScriptCallBack(JavaScriptSourceContext dwReferencingSourceContext, JavaScriptValue specifier, out JavaScriptModuleRecord dependentModuleRecord);
+  public delegate JavaScriptErrorCode JavaScriptFetchImportedModuleFromScriptCallBack(
+    JavaScriptSourceContext dwReferencingSourceContext,
+    JavaScriptValue specifier,
+    out JavaScriptModuleRecord dependentModuleRecord
+  );
 }

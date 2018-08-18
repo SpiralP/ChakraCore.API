@@ -1,7 +1,6 @@
 using System;
 
-namespace ChakraCore.API
-{
+namespace ChakraCore.API {
   /// <summary>
   ///     A Promise Rejection Tracker callback.
   /// </summary>
@@ -21,5 +20,10 @@ namespace ChakraCore.API
   /// <param name="handled">Boolean - false for promiseRejected: i.e. if the promise has just been rejected with no handler,
   ///                         true for promiseHandled: i.e. if it was rejected before without a handler and is now being handled.</param>
   /// <param name="callbackState">The state passed to <c>JsSetHostPromiseRejectionTracker</c>.</param>
-  public delegate void JavaScriptHostPromiseRejectionTrackerCallback(JavaScriptValue promise, JavaScriptValue reason, bool handled, IntPtr callbackState);
+  public delegate void JavaScriptHostPromiseRejectionTrackerCallback(
+    JavaScriptValue promise,
+    JavaScriptValue reason,
+    bool handled,
+    IntPtr callbackState
+  );
 }

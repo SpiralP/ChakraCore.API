@@ -1,10 +1,8 @@
-﻿namespace ChakraCore.API
-{
+﻿namespace ChakraCore.API {
   /// <summary>
   ///     Debug events reported from ChakraCore engine.
   /// </summary>
-  public enum JavaScriptDiagDebugEvent
-  {
+  public enum JavaScriptDiagDebugEvent {
     /// <summary>
     ///     Indicates a new script being compiled, this includes script, eval, new function.
     /// </summary>
