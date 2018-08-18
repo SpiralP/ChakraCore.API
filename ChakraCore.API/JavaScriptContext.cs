@@ -314,7 +314,7 @@ namespace ChakraCore.API
 
     public static void ThrowException(Exception e)
     {
-      ThrowError($"{e.Message}\n{e.StackTrace}");
+      ThrowError($"{e.GetType()}: {e.Message}\n{e.StackTrace}");
     }
 
     /// <summary>

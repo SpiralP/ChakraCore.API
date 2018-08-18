@@ -80,14 +80,14 @@ namespace ChakraCore.API
             {
               if (!ignoreScriptError)
               {
-                string msg = getErrorMessageAndObject(out var errorObject);
+                string msg = getErrorMessageAndObject(out JavaScriptValue errorObject);
                 throw new JavaScriptScriptException(error, errorObject, $"Script threw an exception. {msg}");
               }
               break;
             }
           case JavaScriptErrorCode.ScriptCompile:
             {
-              string msg = getErrorMessageAndObject(out var errorObject);
+              string msg = getErrorMessageAndObject(out JavaScriptValue errorObject);
               throw new JavaScriptScriptException(error, errorObject, $"Compile error. {msg}");
             }
 
