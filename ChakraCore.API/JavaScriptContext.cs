@@ -305,7 +305,17 @@ namespace ChakraCore.API
       Native.ThrowIfError(Native.JsSetException(exception));
     }
 
+    public static void ThrowError(string message)
+    {
+      JavaScriptContext.SetException(
+        JavaScriptValue.CreateError(message)
+      );
+    }
 
+    public static void ThrowException(Exception e)
+    {
+      ThrowError($"{e.Message}\n{e.StackTrace}");
+    }
 
     /// <summary>
     ///     Tells the runtime to do any idle processing it need to do.

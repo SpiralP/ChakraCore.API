@@ -515,6 +515,7 @@ namespace ChakraCore.API
       Native.ThrowIfError(Native.JsCreateError(message, out JavaScriptValue reference));
       return reference;
     }
+
     public static JavaScriptValue CreateError(string message)
     {
       return CreateError(JavaScriptValue.FromString(message));
@@ -533,6 +534,7 @@ namespace ChakraCore.API
       Native.ThrowIfError(Native.JsCreateRangeError(message, out JavaScriptValue reference));
       return reference;
     }
+
     public static JavaScriptValue CreateRangeError(string message)
     {
       return CreateRangeError(JavaScriptValue.FromString(message));
@@ -551,6 +553,7 @@ namespace ChakraCore.API
       Native.ThrowIfError(Native.JsCreateReferenceError(message, out JavaScriptValue reference));
       return reference;
     }
+
     public static JavaScriptValue CreateReferenceError(string message)
     {
       return CreateReferenceError(JavaScriptValue.FromString(message));
@@ -569,6 +572,7 @@ namespace ChakraCore.API
       Native.ThrowIfError(Native.JsCreateSyntaxError(message, out JavaScriptValue reference));
       return reference;
     }
+
     public static JavaScriptValue CreateSyntaxError(string message)
     {
       return CreateSyntaxError(JavaScriptValue.FromString(message));
@@ -587,6 +591,7 @@ namespace ChakraCore.API
       Native.ThrowIfError(Native.JsCreateTypeError(message, out JavaScriptValue reference));
       return reference;
     }
+
     public static JavaScriptValue CreateTypeError(string message)
     {
       return CreateTypeError(JavaScriptValue.FromString(message));
@@ -605,6 +610,7 @@ namespace ChakraCore.API
       Native.ThrowIfError(Native.JsCreateURIError(message, out JavaScriptValue reference));
       return reference;
     }
+
     public static JavaScriptValue CreateUriError(string message)
     {
       return CreateUriError(JavaScriptValue.FromString(message));
