@@ -30,71 +30,327 @@ namespace ChakraCore.API {
     }
 
 
-    public static JavaScriptModuleRecord Create(JavaScriptModuleRecord? parent, string name) {
-      if (string.IsNullOrEmpty(name)) {
-        name = Guid.NewGuid().ToString(); //root module has no name, give it a unique name
+    /// <summary>
+    ///     Initialize a ModuleRecord from host
+    /// </summary>
+    /// <remarks>
+    ///     Bootstrap the module loading process by creating a new module record.
+    /// </remarks>
+    /// <param name="referencingModule">The parent module of the new module - nullptr for a root module.</param>
+    /// <param name="normalizedSpecifier">The normalized specifier for the module.</param>
+    /// <returns>
+    ///     The new module record. The host should not try to call this API twice with the same normalizedSpecifier.
+    /// </returns>
+    public static JavaScriptModuleRecord Initialize(
+      JavaScriptModuleRecord? referencingModule = null,
+      JavaScriptValue? normalizedSpecifier = null
+    ) {
+      JavaScriptValue normalizedSpecifierValue;
+      if (normalizedSpecifier.HasValue) {
+        normalizedSpecifierValue = normalizedSpecifier.Value;
+      } else { // root module has no name, give it a unique name
+        normalizedSpecifierValue = JavaScriptValue.FromString(
+          Guid.NewGuid().ToString()
+        );
       }
-      JavaScriptValue moduleName = JavaScriptValue.FromString(name);
-      JavaScriptModuleRecord result;
-      if (parent.HasValue) {
-        Native.ThrowIfError(Native.JsInitializeModuleRecord(parent.Value, moduleName, out result));
+
+      JavaScriptModuleRecord referencingModuleValue;
+      if (referencingModule.HasValue) {
+        referencingModuleValue = referencingModule.Value;
       } else {
-        Native.ThrowIfError(Native.JsInitializeModuleRecord(JavaScriptModuleRecord.Invalid, moduleName, out result));
+        referencingModuleValue = JavaScriptModuleRecord.Invalid;
       }
 
+      Native.ThrowIfError(
+        Native.JsInitializeModuleRecord(
+          referencingModuleValue,
+          normalizedSpecifierValue,
+          out JavaScriptModuleRecord moduleRecord
+        )
+      );
+      return moduleRecord;
+    }
+
+    public static JavaScriptModuleRecord Initialize(
+      JavaScriptModuleRecord? referencingModule,
+      string normalizedSpecifier
+    ) {
+      if (string.IsNullOrEmpty(normalizedSpecifier)) {
+        return Initialize(referencingModule);
+      } else {
+        return Initialize(referencingModule, JavaScriptValue.FromString(normalizedSpecifier));
+      }
+    }
+
+
+    /// <summary>
+    ///     Parse the source for an ES module
+    /// </summary>
+    /// <remarks>
+    ///     This is basically ParseModule operation in ES6 spec. It is slightly different in that:
+    ///     a) The ModuleRecord was initialized earlier, and passed in as an argument.
+    ///     b) This includes a check to see if the module being Parsed is the last module in the
+    /// dependency tree. If it is it automatically triggers Module Instantiation.
+    /// </remarks>
+    /// <param name="script">The source script to be parsed, but not executed in this code.</param>
+    /// <param name="sourceContext">A cookie identifying the script that can be used by debuggable script contexts.</param>
+    /// <returns>
+    ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
+    /// </returns>
+    public void ParseSource(
+      string script,
+      JavaScriptSourceContext sourceContext
+    ) {
+      byte[] scriptBuffer = Encoding.UTF8.GetBytes(script);
+      uint scriptLength = (uint) scriptBuffer.Length;
+      JavaScriptErrorCode errorCode = Native.JsParseModuleSource(
+        this,
+        sourceContext,
+        scriptBuffer,
+        scriptLength,
+        JavaScriptParseModuleSourceFlags.JsParseModuleSourceFlags_DataIsUTF8,
+        out JavaScriptValue exceptionValue
+      );
+      if (errorCode != JavaScriptErrorCode.NoError) {
+        if (exceptionValue.IsValid) {
+          JavaScriptContext.SetException(exceptionValue);
+        }
+        Native.ThrowIfError(errorCode);
+      }
+    }
+    public void ParseSource(string script) {
+      ParseSource(script, JavaScriptSourceContext.None);
+    }
+
+    /// <summary>
+    ///     Execute module code.
+    /// </summary>
+    /// <remarks>
+    ///     This method implements 15.2.1.1.6.5, "ModuleEvaluation" concrete method.
+    ///     This method should be called after the engine notifies the host that the module is ready.
+    ///     This method only needs to be called on root modules - it will execute all of the dependent modules.
+    ///
+    ///     One moduleRecord will be executed only once. Additional execution call on the same moduleRecord will fail.
+    /// </remarks>
+    /// <returns>
+    ///     The return value of the module.
+    /// </returns>
+    public JavaScriptValue Evaluate() {
+      Native.ThrowIfError(
+        Native.JsModuleEvaluation(
+          this,
+          out JavaScriptValue result
+        )
+      );
       return result;
     }
 
-    public static void ParseScript(JavaScriptModuleRecord module, string script, JavaScriptSourceContext sourceContext) {
-      var buffer = Encoding.UTF8.GetBytes(script);
-      uint length = (uint) buffer.Length;
-      Native.ThrowIfError(Native.JsParseModuleSource(module, sourceContext, buffer, length, JavaScriptParseModuleSourceFlags.JsParseModuleSourceFlags_DataIsUTF8, out JavaScriptValue parseException));
-      if (parseException.IsValid) {
-        string ex = parseException.ToString();
-        throw new InvalidOperationException($"Parse script failed with error={ex}");
+
+    /// <summary>
+    ///   Set an exception on the module object - only relevant prior to it being Parsed
+    /// </summary>
+    /// <param name="exception">An exception object - e.g. if the module file cannot be found.</param>
+    public JavaScriptValue Exception {
+      get {
+        Native.ThrowIfError(
+          Native.JsGetModuleHostInfo(
+            this,
+            JavascriptModuleHostInfoKind.JsModuleHostInfo_Exception,
+            out JavaScriptValue value
+          )
+        );
+        return value;
+      }
+      set {
+        Native.ThrowIfError(
+          Native.JsSetModuleHostInfo(
+            this,
+            JavascriptModuleHostInfoKind.JsModuleHostInfo_Exception,
+            value
+          )
+        );
       }
     }
 
-    public static JavaScriptValue RunModule(JavaScriptModuleRecord module) {
-      Native.ThrowIfError(Native.JsModuleEvaluation(module, out JavaScriptValue result));
-      return result;
-    }
-
-    public static void SetHostUrl(JavaScriptModuleRecord module, string url) {
-      var value = JavaScriptValue.FromString(url);
-      Native.ThrowIfError(Native.JsSetModuleHostInfo(module, JavascriptModuleHostInfoKind.JsModuleHostInfo_Url, value));
+    /// <summary>
+    ///   Set host defined info on a module record - can be anything that you wish to associate with your modules
+    /// </summary>
+    /// <param name="hostInfo">Host defined info.</param>
+    public IntPtr HostDefined {
+      get {
+        Native.ThrowIfError(
+          Native.JsGetModuleHostInfo(
+            this,
+            JavascriptModuleHostInfoKind.JsModuleHostInfo_HostDefined,
+            out IntPtr value
+          )
+        );
+        return value;
+      }
+      set {
+        Native.ThrowIfError(
+          Native.JsSetModuleHostInfo(
+            this,
+            JavascriptModuleHostInfoKind.JsModuleHostInfo_HostDefined,
+            value
+          )
+        );
+      }
     }
 
     /// <summary>
-    /// Set callback from chakraCore when the module resolution is finished, either successfuly or unsuccessfully.
+    ///     Set user implemented callback to get notification when a module is ready.
     /// </summary>
-    /// <param name="module"></param>
-    /// <param name="callback"></param>
-    public static void SetNotifyReady(JavaScriptModuleRecord module, NotifyModuleReadyCallback callback) {
-      Native.ThrowIfError(Native.JsSetModuleNotifyModuleReadyCallback(module, JavascriptModuleHostInfoKind.JsModuleHostInfo_NotifyModuleReadyCallback, callback));
+    /// <remarks>
+    ///     The callback is invoked on the current runtime execution thread, therefore execution is blocked until the
+    ///     callback completes. This callback should schedule a call to JsEvaluateModule to run the module that has been loaded.
+    /// </remarks>
+    /// <param name="callback">Callback for receiving notification when module is ready.</param>
+    public NotifyModuleReadyCallback NotifyModuleReadyCallback {
+      get {
+        Native.ThrowIfError(
+          Native.JsGetModuleHostInfo(
+            this,
+            JavascriptModuleHostInfoKind.JsModuleHostInfo_NotifyModuleReadyCallback,
+            out NotifyModuleReadyCallback value
+          )
+        );
+        return value;
+      }
+      set {
+        Native.ThrowIfError(
+          Native.JsSetModuleHostInfo(
+            this,
+            JavascriptModuleHostInfoKind.JsModuleHostInfo_NotifyModuleReadyCallback,
+            value
+          )
+        );
+      }
     }
 
     /// <summary>
-    /// Set callback from chakracore to fetch dependent module.
-    /// While this call will come back directly from ParseModuleSource, the additional
-    /// task are treated as Promise that will be executed later.
+    ///     Set user implemented callback to fetch additional imported modules in ES modules.
     /// </summary>
-    /// <param name="module"></param>
-    /// <param name="callback"></param>
-    public static void SetFetchModuleCallback(JavaScriptModuleRecord module, FetchImportedModuleCallBack callback) {
-      Native.ThrowIfError(Native.JsFetchImportedModuleCallBack(module, JavascriptModuleHostInfoKind.JsModuleHostInfo_FetchImportedModuleCallback, callback));
+    /// <param name="callback">Callback for receiving notification to fetch a dependent module.</param>
+    /// <remarks>
+    ///     The callback is invoked on the current runtime execution thread, therefore execution is blocked until
+    ///     the callback completes. Notify the host to fetch the dependent module. This is the "import" part
+    ///     before HostResolveImportedModule in ES6 spec. This notifies the host that the referencing module has
+    ///     the specified module dependency, and the host needs to retrieve the module back.
+    ///
+    ///     Callback should:
+    ///     1. Check if the requested module has been requested before - if yes return the existing
+    ///         module record
+    ///     2. If no create and initialize a new module record with JsInitializeModuleRecord to
+    ///         return and schedule a call to JsParseModuleSource for the new record.
+    /// </remarks>
+    public FetchImportedModuleCallBack FetchImportedModuleCallBack {
+      get {
+        Native.ThrowIfError(
+          Native.JsGetModuleHostInfo(
+            this,
+            JavascriptModuleHostInfoKind.JsModuleHostInfo_FetchImportedModuleCallback,
+            out FetchImportedModuleCallBack value
+          )
+        );
+        return value;
+      }
+      set {
+        Native.ThrowIfError(
+          Native.JsSetModuleHostInfo(
+            this,
+            JavascriptModuleHostInfoKind.JsModuleHostInfo_FetchImportedModuleCallback,
+            value
+          )
+        );
+      }
     }
 
     /// <summary>
-    /// Set callback from chakracore to fetch module dynamically during runtime.
-    /// While this call will come back directly from runtime script or module code, the additional
-    /// task can be scheduled asynchronously that executed later.
+    ///     Set user implemented callback to fetch imported modules dynamically in scripts.
     /// </summary>
-    /// <param name="module"></param>
-    /// <param name="callback"></param>
-    public static void SetFetchModuleScriptCallback(JavaScriptModuleRecord module, FetchImportedModuleFromScriptCallBack callback) {
-      Native.ThrowIfError(Native.JsFetchImportedModuleFromScriptCallBack(module, JavascriptModuleHostInfoKind.JsModuleHostInfo_FetchImportedModuleFromScriptCallback, callback));
+    /// <param name="callback">Callback for receiving notification for calls to import()</param>
+    /// <remarks>
+    ///     The callback is invoked on the current runtime execution thread, therefore execution is blocked untill
+    ///     the callback completes. Notify the host to fetch the dependent module. This is used for the dynamic
+    ///     import() syntax.
+    ///
+    ///     Callback should:
+    ///     1. Check if the requested module has been requested before - if yes return the existing module record
+    ///     2. If no create and initialize a new module record with JsInitializeModuleRecord to return and
+    ///         schedule a call to JsParseModuleSource for the new record.
+    /// </remarks>
+    public FetchImportedModuleFromScriptCallBack FetchImportedModuleFromScriptCallBack {
+      get {
+        Native.ThrowIfError(
+          Native.JsGetModuleHostInfo(
+            this,
+            JavascriptModuleHostInfoKind.JsModuleHostInfo_FetchImportedModuleFromScriptCallback,
+            out FetchImportedModuleFromScriptCallBack value
+          )
+        );
+        return value;
+      }
+      set {
+        Native.ThrowIfError(
+          Native.JsSetModuleHostInfo(
+            this,
+            JavascriptModuleHostInfoKind.JsModuleHostInfo_FetchImportedModuleFromScriptCallback,
+            value
+          )
+        );
+      }
     }
+
+    /// <summary>
+    ///   Set a URL for a module to be used for stack traces/debugging
+    ///   - note this must be set before calling JsParseModuleSource on the module or it will be ignored
+    /// </summary>
+    /// <param name="url">URL for use in error stack traces and debugging.</param>
+    public string HostUrl {
+      get {
+        Native.ThrowIfError(
+          Native.JsGetModuleHostInfo(
+            this,
+            JavascriptModuleHostInfoKind.JsModuleHostInfo_Url,
+            out JavaScriptValue result
+          )
+        );
+        return result.ToString();
+      }
+      set {
+        Native.ThrowIfError(
+          Native.JsSetModuleHostInfo(
+            this,
+            JavascriptModuleHostInfoKind.JsModuleHostInfo_Url,
+            JavaScriptValue.FromString(value)
+          )
+        );
+      }
+    }
+
+
+    /// <summary>
+    ///     Retrieve the namespace object for a module.
+    /// </summary>
+    /// <remarks>
+    ///     Requires an active script context and that the module has already been evaluated.
+    /// </remarks>
+    /// <returns>
+    ///     The requested namespace object.
+    /// </returns>
+    public JavaScriptValue Namespace {
+      get {
+        Native.ThrowIfError(
+          Native.JsGetModuleNamespace(
+            this,
+            out JavaScriptValue moduleNamespace
+          )
+        );
+        return moduleNamespace;
+      }
+    }
+
   }
 
 
@@ -167,5 +423,8 @@ namespace ChakraCore.API {
   /// <returns>
   ///     Returns a JsErrorCode - note, the return value is ignored.
   /// </returns>
-  public delegate JavaScriptErrorCode NotifyModuleReadyCallback(JavaScriptModuleRecord referencingModule, JavaScriptValue exceptionVar);
+  public delegate JavaScriptErrorCode NotifyModuleReadyCallback(
+    JavaScriptModuleRecord referencingModule,
+    JavaScriptValue exceptionVar
+  );
 }
