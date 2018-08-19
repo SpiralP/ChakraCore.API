@@ -101,59 +101,69 @@ namespace ChakraCore.API {
     }
 
     private static string getErrorMessageAndObject(out JavaScriptValue errorObject) {
-      JavaScriptErrorCode result;
-      result = JsGetAndClearExceptionWithMetadata(out JavaScriptValue metadata); // exception line column length source url
+      JavaScriptErrorCode result = JsGetAndClearExceptionWithMetadata(out JavaScriptValue metadata); // exception line column length source url
       if (result != JavaScriptErrorCode.NoError) {
-        throw new JavaScriptFatalException(result, "JsGetAndClearExceptionWithMetadata failed: " + result);
+        errorObject = JavaScriptValue.Invalid;
+        return "Failed to get js Error! JsGetAndClearExceptionWithMetadata failed: " + result;
       }
 
-      string source = metadata.GetProperty("source").ToString();
+      errorObject = metadata.GetProperty("exception");
+
+
+      string source = metadata.GetProperty("source").ToString(); // can be string "undefined"
       string url = metadata.GetProperty("url").ToString();
       int line = metadata.GetProperty("line").ToInt32(); // 0 based
       int column = metadata.GetProperty("column").ToInt32(); // 0 based
 
-      errorObject = metadata.GetProperty("exception");
-
       JavaScriptValueType valueType = errorObject.ValueType;
 
       string message;
+      bool hasStack = false;
       if (valueType == JavaScriptValueType.Error) {
-        JavaScriptValue stackProp = errorObject.GetProperty("stack"); // can be undefined sometimes (Compile error/syntax)
+        // can be undefined sometimes (Compile error/syntax)
+        JavaScriptValue stackProp = errorObject.GetProperty("stack");
 
         if (stackProp.ValueType == JavaScriptValueType.String) {
           // stack includes message, if it exists
-          string errorStack = stackProp.ToString();
-          message = errorStack;
+          hasStack = true;
+          message = stackProp.ToString();
         } else {
-          string errorMessage = errorObject.GetProperty("message").ToString();
-          message = $"{errorMessage}\n   at {url}:{line + 1}:{column + 1}";
+          message = errorObject.GetProperty("message").ToString();
         }
       } else { // something that isn't Error
         string toString = errorObject.ConvertToString().ToString();
-        message = $"{toString} ({valueType})\n   at {url}:{line + 1}:{column + 1}";
+        message = $"{toString} ({valueType})";
+      }
+
+      if (!hasStack && url != "undefined" && line != 0 && column != 0) {
+        message = $"{message}\n   at {url}:{line + 1}:{column + 1}";
       }
 
 
       message = $"\n{message}\n";
 
-      if (source.Length < column) { // something weird happened and we couldn't obtain the full source line
+      if (source != "undefined") {
+        if (source.Length < column) { // something weird happened and we couldn't obtain the full source line
+          return message;
+        }
+
+        const int charsOnEachSide = 30;
+
+        int index = Math.Min(
+          Math.Max(0, column - charsOnEachSide),
+          source.Length
+        );
+
+        source = source.Substring(
+          index,
+          Math.Min(charsOnEachSide * 2 + 1, source.Length - index)
+        );
+
+        string arrow = new String(' ', (column - index) + (line + 1).ToString().Length + 2) + "^"; // repeat space char
+        return message + $"{line + 1}| {source}\n{arrow}\n";
+      } else {
         return message;
       }
-
-      const int charsOnEachSide = 30;
-
-      int index = Math.Min(
-        Math.Max(0, column - charsOnEachSide),
-        source.Length
-      );
-
-      source = source.Substring(
-        index,
-        Math.Min(charsOnEachSide * 2 + 1, source.Length - index)
-      );
-
-      string arrow = new String(' ', (column - index) + (line + 1).ToString().Length + 2) + "^"; // repeat space char
-      return message + $"{line + 1}| {source}\n{arrow}\n";
     }
 
 
@@ -334,6 +344,8 @@ namespace ChakraCore.API {
     [DllImport(DllName)]
     public static extern JavaScriptErrorCode JsAddRef(JavaScriptContext reference, out uint count);
 
+    [DllImport(DllName)]
+    public static extern JavaScriptErrorCode JsAddRef(JavaScriptModuleRecord reference, out uint count);
 
     /// <summary>
     ///     Releases a reference to a garbage collected object.
@@ -1702,9 +1714,9 @@ namespace ChakraCore.API {
     /// </returns>
     [DllImport(DllName)]
     public static extern JavaScriptErrorCode JsInitializeModuleRecord(
-      JavaScriptModuleRecord parent,
-      JavaScriptValue name,
-      out JavaScriptModuleRecord result
+      JavaScriptModuleRecord referencingModule,
+      JavaScriptValue normalizedSpecifier,
+      out JavaScriptModuleRecord moduleRecord
     );
 
     /// <summary>
@@ -1727,12 +1739,12 @@ namespace ChakraCore.API {
     /// </returns>
     [DllImport(DllName)]
     public static extern JavaScriptErrorCode JsParseModuleSource(
-      JavaScriptModuleRecord moduel,
+      JavaScriptModuleRecord requestModule,
       JavaScriptSourceContext sourceContext,
       byte[] script,
       uint scriptLength,
-      JavaScriptParseModuleSourceFlags flags,
-      out JavaScriptValue parseException
+      JavaScriptParseModuleSourceFlags sourceFlag,
+      out JavaScriptValue exceptionValueRef
     );
 
     /// <summary>
@@ -1788,25 +1800,25 @@ namespace ChakraCore.API {
     public static extern JavaScriptErrorCode JsSetModuleHostInfo(
       JavaScriptModuleRecord requestModule,
       JavascriptModuleHostInfoKind moduleHostInfo,
-      JavaScriptValue value
+      JavaScriptValue hostInfo
     );
 
-    [DllImport(DllName, EntryPoint = "JsSetModuleHostInfo")]
-    public static extern JavaScriptErrorCode JsSetModuleNotifyModuleReadyCallback(
+    [DllImport(DllName)]
+    public static extern JavaScriptErrorCode JsSetModuleHostInfo(
       JavaScriptModuleRecord requestModule,
       JavascriptModuleHostInfoKind moduleHostInfo,
       NotifyModuleReadyCallback hostInfo
     );
 
-    [DllImport(DllName, EntryPoint = "JsSetModuleHostInfo")]
-    public static extern JavaScriptErrorCode JsFetchImportedModuleCallBack(
+    [DllImport(DllName)]
+    public static extern JavaScriptErrorCode JsSetModuleHostInfo(
       JavaScriptModuleRecord requestModule,
       JavascriptModuleHostInfoKind moduleHostInfo,
       FetchImportedModuleCallBack hostInfo
     );
 
-    [DllImport(DllName, EntryPoint = "JsSetModuleHostInfo")]
-    public static extern JavaScriptErrorCode JsFetchImportedModuleFromScriptCallBack(
+    [DllImport(DllName)]
+    public static extern JavaScriptErrorCode JsSetModuleHostInfo(
       JavaScriptModuleRecord requestModule,
       JavascriptModuleHostInfoKind moduleHostInfo,
       FetchImportedModuleFromScriptCallBack hostInfo
@@ -1829,6 +1841,34 @@ namespace ChakraCore.API {
       JavaScriptModuleRecord requestModule,
       JavascriptModuleHostInfoKind moduleHostInfo,
       out IntPtr hostInfo
+    );
+
+    [DllImport(DllName)]
+    public static extern JavaScriptErrorCode JsGetModuleHostInfo(
+      JavaScriptModuleRecord requestModule,
+      JavascriptModuleHostInfoKind moduleHostInfo,
+      out JavaScriptValue hostInfo
+    );
+
+    [DllImport(DllName)]
+    public static extern JavaScriptErrorCode JsGetModuleHostInfo(
+      JavaScriptModuleRecord requestModule,
+      JavascriptModuleHostInfoKind moduleHostInfo,
+      out NotifyModuleReadyCallback hostInfo
+    );
+
+    [DllImport(DllName)]
+    public static extern JavaScriptErrorCode JsGetModuleHostInfo(
+      JavaScriptModuleRecord requestModule,
+      JavascriptModuleHostInfoKind moduleHostInfo,
+      out FetchImportedModuleCallBack hostInfo
+    );
+
+    [DllImport(DllName)]
+    public static extern JavaScriptErrorCode JsGetModuleHostInfo(
+      JavaScriptModuleRecord requestModule,
+      JavascriptModuleHostInfoKind moduleHostInfo,
+      out FetchImportedModuleFromScriptCallBack hostInfo
     );
 
     /// <summary>

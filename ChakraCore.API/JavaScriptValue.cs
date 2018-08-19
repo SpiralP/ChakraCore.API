@@ -174,7 +174,11 @@ namespace ChakraCore.API {
     /// </remarks>
     public static JavaScriptValue GlobalObject {
       get {
-        Native.ThrowIfError(Native.JsGetGlobalObject(out JavaScriptValue value));
+        Native.ThrowIfError(
+          Native.JsGetGlobalObject(
+            out JavaScriptValue value
+          )
+        );
         return value;
       }
     }
@@ -188,7 +192,12 @@ namespace ChakraCore.API {
     /// <returns>The type of the value.</returns>
     public JavaScriptValueType ValueType {
       get {
-        Native.ThrowIfError(Native.JsGetValueType(this, out JavaScriptValueType type));
+        Native.ThrowIfError(
+          Native.JsGetValueType(
+            this,
+            out JavaScriptValueType type
+          )
+        );
         return type;
       }
     }
@@ -202,7 +211,12 @@ namespace ChakraCore.API {
     /// <returns>The length of the string.</returns>
     public int StringLength {
       get {
-        Native.ThrowIfError(Native.JsGetStringLength(this, out int length));
+        Native.ThrowIfError(
+          Native.JsGetStringLength(
+            this,
+            out int length
+          )
+        );
         return length;
       }
     }
@@ -215,12 +229,22 @@ namespace ChakraCore.API {
     /// </remarks>
     public JavaScriptValue Prototype {
       get {
-        Native.ThrowIfError(Native.JsGetPrototype(this, out JavaScriptValue prototypeReference));
+        Native.ThrowIfError(
+          Native.JsGetPrototype(
+            this,
+            out JavaScriptValue prototypeReference
+          )
+        );
         return prototypeReference;
       }
 
       set {
-        Native.ThrowIfError(Native.JsSetPrototype(this, value));
+        Native.ThrowIfError(
+          Native.JsSetPrototype(
+            this,
+            value
+          )
+        );
       }
     }
 
