@@ -138,6 +138,37 @@
     PropertyNotString,
 
     /// <summary>
+    ///     Module evaluation is called in wrong context.
+    /// </summary>
+    InvalidContext,
+
+    /// <summary>
+    ///     Module evaluation is called in wrong context.
+    /// </summary>
+    InvalidModuleHostInfoKind,
+
+    /// <summary>
+    ///     Module was parsed already when JsParseModuleSource is called.
+    /// </summary>
+    ModuleParsed,
+
+    /// <summary>
+    ///     Argument passed to JsCreateWeakReference is a primitive that is not managed by the GC.
+    ///     No weak reference is required, the value will never be collected.
+    /// </summary>
+    NoWeakRefRequired,
+
+    /// <summary>
+    ///     The <c>Promise</c> object is still in the pending state.
+    /// </summary>
+    PromisePending,
+
+    /// <summary>
+    ///     Module was not yet evaluated when JsGetModuleNamespace was called.
+    /// </summary>
+    ModuleNotEvaluated,
+
+    /// <summary>
     ///     Category of errors that relates to errors occurring within the engine itself.
     /// </summary>
     CategoryEngine = 0x20000,
@@ -146,6 +177,11 @@
     ///     The Chakra engine has run out of memory.
     /// </summary>
     OutOfMemory,
+
+    /// <summary>
+    ///     The Chakra engine failed to set the Floating Point Unit state.
+    /// </summary>
+    BadFPUState,
 
     /// <summary>
     ///     Category of errors that relates to errors in a script.
@@ -187,5 +223,40 @@
     ///     A hosting API was called with object created on different javascript runtime.
     /// </summary>
     WrongRuntime,
+
+    /// <summary>
+    ///     Category of errors that are related to failures during diagnostic operations.
+    /// </summary>
+    CategoryDiagError = 0x50000,
+
+    /// <summary>
+    ///     The object for which the debugging API was called was not found
+    /// </summary>
+    DiagAlreadyInDebugMode,
+
+    /// <summary>
+    ///     The debugging API can only be called when VM is in debug mode
+    /// </summary>
+    DiagNotInDebugMode,
+
+    /// <summary>
+    ///     The debugging API can only be called when VM is at a break
+    /// </summary>
+    DiagNotAtBreak,
+
+    /// <summary>
+    ///     Debugging API was called with an invalid handle.
+    /// </summary>
+    DiagInvalidHandle,
+
+    /// <summary>
+    ///     The object for which the debugging API was called was not found
+    /// </summary>
+    DiagObjectNotFound,
+
+    /// <summary>
+    ///     VM was unable to perform the request action
+    /// </summary>
+    DiagUnableToPerformAction,
   }
 }
