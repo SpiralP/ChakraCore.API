@@ -82,6 +82,13 @@ namespace ChakraCore.API {
       }
     }
 
+    public uint AddRef() {
+      Native.ThrowIfError(
+        Native.JsAddRef(this, out uint count)
+      );
+      return count;
+    }
+
 
     /// <summary>
     ///     Parse the source for an ES module
@@ -307,7 +314,7 @@ namespace ChakraCore.API {
     ///   - note this must be set before calling JsParseModuleSource on the module or it will be ignored
     /// </summary>
     /// <param name="url">URL for use in error stack traces and debugging.</param>
-    public string HostUrl {
+    public string HostUrl { // TODO will this throw?
       get {
         Native.ThrowIfError(
           Native.JsGetModuleHostInfo(
