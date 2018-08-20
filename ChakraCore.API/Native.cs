@@ -135,7 +135,7 @@ namespace ChakraCore.API {
         message = $"{toString} ({valueType})";
       }
 
-      if (!hasStack && url != "undefined" && line != 0 && column != 0) {
+      if (!hasStack && (url != "undefined" || line != 0 || column != 0)) {
         message = $"{message}\n   at {url}:{line + 1}:{column + 1}";
       }
 
