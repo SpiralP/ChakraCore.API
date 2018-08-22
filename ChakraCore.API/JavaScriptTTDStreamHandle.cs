@@ -24,6 +24,13 @@ namespace ChakraCore.API {
     public static JavaScriptTTDStreamHandle Invalid {
       get { return new JavaScriptTTDStreamHandle(IntPtr.Zero); }
     }
+
+    /// <summary>
+    ///     Gets a value indicating whether the stream handle is valid.
+    /// </summary>
+    public bool IsValid {
+      get { return reference != IntPtr.Zero; }
+    }
   }
 
 

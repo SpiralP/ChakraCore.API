@@ -29,6 +29,13 @@ namespace ChakraCore.API {
       get { return new JavaScriptModuleRecord(IntPtr.Zero); }
     }
 
+    /// <summary>
+    ///     Gets a value indicating whether the record is valid.
+    /// </summary>
+    public bool IsValid {
+      get { return reference != IntPtr.Zero; }
+    }
+
 
     /// <summary>
     ///     Initialize a ModuleRecord from host

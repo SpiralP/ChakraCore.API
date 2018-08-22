@@ -29,6 +29,13 @@ namespace ChakraCore.API {
     public static JavaScriptProjectionCallbackContext Invalid {
       get { return new JavaScriptProjectionCallbackContext(IntPtr.Zero); }
     }
+
+    /// <summary>
+    ///     Gets a value indicating whether the callback context is valid.
+    /// </summary>
+    public bool IsValid {
+      get { return reference != IntPtr.Zero; }
+    }
   }
 
   /// <summary>

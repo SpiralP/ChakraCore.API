@@ -29,5 +29,12 @@ namespace ChakraCore.API {
     public static JavaScriptWeakRef Invalid {
       get { return new JavaScriptWeakRef(IntPtr.Zero); }
     }
+
+    /// <summary>
+    ///     Gets a value indicating whether the reference is valid.
+    /// </summary>
+    public bool IsValid {
+      get { return reference != IntPtr.Zero; }
+    }
   }
 }

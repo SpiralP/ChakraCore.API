@@ -28,5 +28,12 @@ namespace ChakraCore.API {
     public static JavaScriptSharedArrayBufferContentHandle Invalid {
       get { return new JavaScriptSharedArrayBufferContentHandle(IntPtr.Zero); }
     }
+
+    /// <summary>
+    ///     Gets a value indicating whether the content handle is valid.
+    /// </summary>
+    public bool IsValid {
+      get { return reference != IntPtr.Zero; }
+    }
   }
 }
