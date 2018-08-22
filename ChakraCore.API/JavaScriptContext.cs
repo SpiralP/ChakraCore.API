@@ -75,7 +75,8 @@ namespace ChakraCore.API {
     ///     The object's new reference count.
     /// </returns>
     public uint AddRef() {
-      Native.ThrowIfError(Native.JsAddRef(this, out uint count));
+      uint count;
+      Native.ThrowIfError(Native.JsAddRef(this, out count));
       return count;
     }
 
@@ -89,7 +90,8 @@ namespace ChakraCore.API {
     ///     The object's new reference count.
     /// </returns>
     public uint Release() {
-      Native.ThrowIfError(Native.JsRelease(this, out uint count));
+      uint count;
+      Native.ThrowIfError(Native.JsRelease(this, out count));
       return count;
     }
 
@@ -105,7 +107,8 @@ namespace ChakraCore.API {
     ///     The created script context.
     /// </returns>
     public static JavaScriptContext CreateContext(JavaScriptRuntime runtime) {
-      Native.ThrowIfError(Native.JsCreateContext(runtime, out JavaScriptContext newContext));
+      JavaScriptContext newContext;
+      Native.ThrowIfError(Native.JsCreateContext(runtime, out newContext));
       return newContext;
     }
 
@@ -118,7 +121,8 @@ namespace ChakraCore.API {
     /// </returns>
     public static JavaScriptContext Current {
       get {
-        Native.ThrowIfError(Native.JsGetCurrentContext(out JavaScriptContext reference));
+        JavaScriptContext reference;
+        Native.ThrowIfError(Native.JsGetCurrentContext(out reference));
         return reference;
       }
 
@@ -136,7 +140,8 @@ namespace ChakraCore.API {
     ///     The context the object belongs to.
     /// </returns>
     public static JavaScriptContext GetContextOfObject(JavaScriptValue obj) {
-      Native.ThrowIfError(Native.JsGetContextOfObject(obj, out JavaScriptContext context));
+      JavaScriptContext context;
+      Native.ThrowIfError(Native.JsGetContextOfObject(obj, out context));
       return context;
     }
 
@@ -147,7 +152,8 @@ namespace ChakraCore.API {
     ///     The pointer to the data where data will be returned.
     /// </returns>
     public IntPtr GetContextData() {
-      Native.ThrowIfError(Native.JsGetContextData(this, out IntPtr data));
+      IntPtr data;
+      Native.ThrowIfError(Native.JsGetContextData(this, out data));
       return data;
     }
 
@@ -166,7 +172,8 @@ namespace ChakraCore.API {
     ///     The runtime the context belongs to.
     /// </returns>
     public JavaScriptRuntime GetRuntime() {
-      Native.ThrowIfError(Native.JsGetRuntime(this, out JavaScriptRuntime runtime));
+      JavaScriptRuntime runtime;
+      Native.ThrowIfError(Native.JsGetRuntime(this, out runtime));
       return runtime;
     }
 
@@ -187,7 +194,8 @@ namespace ChakraCore.API {
       JavaScriptRuntime runtimeHandle,
       bool useRuntimeTTDMode
     ) {
-      Native.ThrowIfError(Native.JsTTDCreateContext(runtimeHandle, useRuntimeTTDMode, out JavaScriptContext newContext));
+      JavaScriptContext newContext;
+      Native.ThrowIfError(Native.JsTTDCreateContext(runtimeHandle, useRuntimeTTDMode, out newContext));
       return newContext;
     }
 
@@ -228,7 +236,8 @@ namespace ChakraCore.API {
     /// </returns>
     public static bool HasException {
       get {
-        Native.ThrowIfError(Native.JsHasException(out bool hasException));
+        bool hasException;
+        Native.ThrowIfError(Native.JsHasException(out hasException));
         return hasException;
       }
     }
@@ -253,7 +262,8 @@ namespace ChakraCore.API {
     ///     The exception for the runtime of the current context.
     /// </returns>
     public static JavaScriptValue GetAndClearException() {
-      Native.ThrowIfError(Native.JsGetAndClearException(out JavaScriptValue exception));
+      JavaScriptValue exception;
+      Native.ThrowIfError(Native.JsGetAndClearException(out exception));
       return exception;
     }
 
@@ -309,7 +319,8 @@ namespace ChakraCore.API {
     ///     maximum number of ticks if there no upcoming idle work to do.
     /// </returns>
     public static uint Idle() {
-      Native.ThrowIfError(Native.JsIdle(out uint nextIdleTick));
+      uint nextIdleTick;
+      Native.ThrowIfError(Native.JsIdle(out nextIdleTick));
       return nextIdleTick;
     }
 
@@ -346,13 +357,14 @@ namespace ChakraCore.API {
       JavaScriptParseScriptAttributes parseAttributes,
       bool ignoreScriptError = false
     ) {
+      JavaScriptValue result;
       Native.ThrowIfError(
         Native.JsRun(
           script,
           sourceContext,
           sourceUrl,
           parseAttributes,
-          out JavaScriptValue result
+          out result
         ),
         ignoreScriptError
       );
@@ -422,13 +434,14 @@ namespace ChakraCore.API {
       JavaScriptParseScriptAttributes parseAttributes,
       bool ignoreScriptError = false
     ) {
+      JavaScriptValue result;
       Native.ThrowIfError(
         Native.JsParse(
           script,
           sourceContext,
           sourceUrl,
           parseAttributes,
-          out JavaScriptValue result
+          out result
         ),
         ignoreScriptError
       );

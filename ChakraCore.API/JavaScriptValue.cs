@@ -65,7 +65,8 @@ namespace ChakraCore.API {
     /// </remarks>
     public static JavaScriptValue Undefined {
       get {
-        Native.ThrowIfError(Native.JsGetUndefinedValue(out JavaScriptValue value));
+        JavaScriptValue value;
+        Native.ThrowIfError(Native.JsGetUndefinedValue(out value));
         return value;
       }
     }
@@ -79,47 +80,59 @@ namespace ChakraCore.API {
     /// <param name="callbackState">reference, can be null</param>
     /// <returns></returns>
     public static JavaScriptValue CreateExternalArrayBuffer(IntPtr data, uint byteLength, JavaScriptFinalizeCallback finalizeCallback, IntPtr callbackState) {
-      Native.ThrowIfError(Native.JsCreateExternalArrayBuffer(data, byteLength, finalizeCallback, callbackState, out JavaScriptValue result));
+      JavaScriptValue result;
+      Native.ThrowIfError(Native.JsCreateExternalArrayBuffer(data, byteLength, finalizeCallback, callbackState, out result));
       return result;
     }
 
 
     public static JavaScriptValue CreateArrayBuffer(uint byteLength) {
-      Native.ThrowIfError(Native.JsCreateArrayBuffer(byteLength, out JavaScriptValue result));
+      JavaScriptValue result;
+      Native.ThrowIfError(Native.JsCreateArrayBuffer(byteLength, out result));
       return result;
     }
 
 
     public static JavaScriptValue CreateTypedArray(JavaScriptTypedArrayType arrayType, JavaScriptValue arrayBuffer, uint byteOffset, uint elementLength) {
-      Native.ThrowIfError(Native.JsCreateTypedArray(arrayType, arrayBuffer, byteOffset, elementLength, out JavaScriptValue result));
+      JavaScriptValue result;
+      Native.ThrowIfError(Native.JsCreateTypedArray(arrayType, arrayBuffer, byteOffset, elementLength, out result));
       return result;
     }
 
     public static IntPtr GetArrayBufferStorage(JavaScriptValue value, out uint bufferSize) {
-      Native.ThrowIfError(Native.JsGetArrayBufferStorage(value, out IntPtr data, out uint bufferLength));
+      IntPtr data;
+      uint bufferLength;
+      Native.ThrowIfError(Native.JsGetArrayBufferStorage(value, out data, out bufferLength));
       bufferSize = bufferLength;
       return data;
     }
 
     public static JavaScriptValue CreateDataView(JavaScriptValue arrayBuffer, uint byteOffset, uint byteOffsetLength) {
-      Native.ThrowIfError(Native.JsCreateDataView(arrayBuffer, byteOffset, byteOffsetLength, out JavaScriptValue result));
+      JavaScriptValue result;
+      Native.ThrowIfError(Native.JsCreateDataView(arrayBuffer, byteOffset, byteOffsetLength, out result));
       return result;
     }
 
     public static void GetDataViewStorage(JavaScriptValue dataView, out IntPtr data, out uint bufferLength) {
-      Native.ThrowIfError(Native.JsGetDataViewStorage(dataView, out IntPtr _data, out uint _bufferLength));
+      IntPtr _data;
+      uint _bufferLength;
+      Native.ThrowIfError(Native.JsGetDataViewStorage(dataView, out _data, out _bufferLength));
       data = _data;
       bufferLength = _bufferLength;
     }
 
 
     public static void GetTypedArrayStorage(JavaScriptValue typedArray, out IntPtr data, out uint bufferLength, out JavaScriptTypedArrayType arrayType, out int elementSize) {
+      IntPtr _data;
+      uint _bufferLength;
+      JavaScriptTypedArrayType _arrayType;
+      int _elementSize;
       Native.ThrowIfError(Native.JsGetTypedArrayStorage(
         typedArray,
-        out IntPtr _data,
-        out uint _bufferLength,
-        out JavaScriptTypedArrayType _arrayType,
-        out int _elementSize
+        out _data,
+        out _bufferLength,
+        out _arrayType,
+        out _elementSize
       ));
       data = _data;
       bufferLength = _bufferLength;
@@ -135,7 +148,8 @@ namespace ChakraCore.API {
     /// </remarks>
     public static JavaScriptValue Null {
       get {
-        Native.ThrowIfError(Native.JsGetNullValue(out JavaScriptValue value));
+        JavaScriptValue value;
+        Native.ThrowIfError(Native.JsGetNullValue(out value));
         return value;
       }
     }
@@ -148,7 +162,8 @@ namespace ChakraCore.API {
     /// </remarks>
     public static JavaScriptValue True {
       get {
-        Native.ThrowIfError(Native.JsGetTrueValue(out JavaScriptValue value));
+        JavaScriptValue value;
+        Native.ThrowIfError(Native.JsGetTrueValue(out value));
         return value;
       }
     }
@@ -161,7 +176,8 @@ namespace ChakraCore.API {
     /// </remarks>
     public static JavaScriptValue False {
       get {
-        Native.ThrowIfError(Native.JsGetFalseValue(out JavaScriptValue value));
+        JavaScriptValue value;
+        Native.ThrowIfError(Native.JsGetFalseValue(out value));
         return value;
       }
     }
@@ -174,9 +190,10 @@ namespace ChakraCore.API {
     /// </remarks>
     public static JavaScriptValue GlobalObject {
       get {
+        JavaScriptValue value;
         Native.ThrowIfError(
           Native.JsGetGlobalObject(
-            out JavaScriptValue value
+            out value
           )
         );
         return value;
@@ -192,10 +209,11 @@ namespace ChakraCore.API {
     /// <returns>The type of the value.</returns>
     public JavaScriptValueType ValueType {
       get {
+        JavaScriptValueType type;
         Native.ThrowIfError(
           Native.JsGetValueType(
             this,
-            out JavaScriptValueType type
+            out type
           )
         );
         return type;
@@ -211,10 +229,11 @@ namespace ChakraCore.API {
     /// <returns>The length of the string.</returns>
     public int StringLength {
       get {
+        int length;
         Native.ThrowIfError(
           Native.JsGetStringLength(
             this,
-            out int length
+            out length
           )
         );
         return length;
@@ -229,10 +248,11 @@ namespace ChakraCore.API {
     /// </remarks>
     public JavaScriptValue Prototype {
       get {
+        JavaScriptValue prototypeReference;
         Native.ThrowIfError(
           Native.JsGetPrototype(
             this,
-            out JavaScriptValue prototypeReference
+            out prototypeReference
           )
         );
         return prototypeReference;
@@ -256,7 +276,8 @@ namespace ChakraCore.API {
     /// </remarks>
     public bool IsExtensionAllowed {
       get {
-        Native.ThrowIfError(Native.JsGetExtensionAllowed(this, out bool allowed));
+        bool allowed;
+        Native.ThrowIfError(Native.JsGetExtensionAllowed(this, out allowed));
         return allowed;
       }
     }
@@ -269,7 +290,8 @@ namespace ChakraCore.API {
     /// </remarks>
     public bool HasExternalData {
       get {
-        Native.ThrowIfError(Native.JsHasExternalData(this, out bool hasExternalData));
+        bool hasExternalData;
+        Native.ThrowIfError(Native.JsHasExternalData(this, out hasExternalData));
         return hasExternalData;
       }
     }
@@ -282,7 +304,8 @@ namespace ChakraCore.API {
     /// </remarks>
     public IntPtr ExternalData {
       get {
-        Native.ThrowIfError(Native.JsGetExternalData(this, out IntPtr data));
+        IntPtr data;
+        Native.ThrowIfError(Native.JsGetExternalData(this, out data));
         return data;
       }
 
@@ -300,7 +323,8 @@ namespace ChakraCore.API {
     /// <param name="value">The value to be converted.</param>
     /// <returns>The converted value.</returns>
     public static JavaScriptValue FromBoolean(bool value) {
-      Native.ThrowIfError(Native.JsBoolToBoolean(value, out JavaScriptValue reference));
+      JavaScriptValue reference;
+      Native.ThrowIfError(Native.JsBoolToBoolean(value, out reference));
       return reference;
     }
 
@@ -313,7 +337,8 @@ namespace ChakraCore.API {
     /// <param name="value">The value to be converted.</param>
     /// <returns>The new <c>Number</c> value.</returns>
     public static JavaScriptValue FromDouble(double value) {
-      Native.ThrowIfError(Native.JsDoubleToNumber(value, out JavaScriptValue reference));
+      JavaScriptValue reference;
+      Native.ThrowIfError(Native.JsDoubleToNumber(value, out reference));
       return reference;
     }
 
@@ -326,7 +351,8 @@ namespace ChakraCore.API {
     /// <param name="value">The value to be converted.</param>
     /// <returns>The new <c>Number</c> value.</returns>
     public static JavaScriptValue FromInt32(int value) {
-      Native.ThrowIfError(Native.JsIntToNumber(value, out JavaScriptValue reference));
+      JavaScriptValue reference;
+      Native.ThrowIfError(Native.JsIntToNumber(value, out reference));
       return reference;
     }
 
@@ -339,11 +365,12 @@ namespace ChakraCore.API {
     /// <param name="value">The string  to convert to a <c>String</c> value.</param>
     /// <returns>The new <c>String</c> value.</returns>
     public static JavaScriptValue FromString(string value) {
+      JavaScriptValue reference;
       Native.ThrowIfError(
         Native.JsCreateStringUtf16(
           value,
           (UIntPtr) value.Length,
-          out JavaScriptValue reference
+          out reference
         )
       );
       return reference;
@@ -357,7 +384,8 @@ namespace ChakraCore.API {
     /// </remarks>
     /// <returns>The new <c>Object</c>.</returns>
     public static JavaScriptValue CreateObject() {
-      Native.ThrowIfError(Native.JsCreateObject(out JavaScriptValue reference));
+      JavaScriptValue reference;
+      Native.ThrowIfError(Native.JsCreateObject(out reference));
       return reference;
     }
 
@@ -373,7 +401,8 @@ namespace ChakraCore.API {
     /// </param>
     /// <returns>The new <c>Object</c>.</returns>
     public static JavaScriptValue CreateExternalObject(IntPtr data, JavaScriptFinalizeCallback finalizer) {
-      Native.ThrowIfError(Native.JsCreateExternalObject(data, finalizer, out JavaScriptValue reference));
+      JavaScriptValue reference;
+      Native.ThrowIfError(Native.JsCreateExternalObject(data, finalizer, out reference));
       return reference;
     }
 
@@ -396,8 +425,9 @@ namespace ChakraCore.API {
       JavaScriptFinalizeCallback finalizeCallback,
       JavaScriptValue prototype
     ) {
+      JavaScriptValue obj;
       Native.ThrowIfError(
-        Native.JsCreateExternalObjectWithPrototype(data, finalizeCallback, prototype, out JavaScriptValue obj)
+        Native.JsCreateExternalObjectWithPrototype(data, finalizeCallback, prototype, out obj)
       );
       return obj;
     }
@@ -411,7 +441,14 @@ namespace ChakraCore.API {
     /// <param name="function">The method to call when the function is invoked.</param>
     /// <returns>The new function object.</returns>
     public static JavaScriptValue CreateFunction(JavaScriptNativeFunction function) {
-      Native.ThrowIfError(Native.JsCreateFunction(function, IntPtr.Zero, out JavaScriptValue reference));
+      JavaScriptValue reference;
+      Native.ThrowIfError(
+        Native.JsCreateFunction(
+          function,
+          IntPtr.Zero,
+          out reference
+        )
+      );
       return reference;
     }
 
@@ -425,7 +462,15 @@ namespace ChakraCore.API {
     /// <param name="name">The name of the function.</param>
     /// <returns>The new function object.</returns>
     public static JavaScriptValue CreateFunction(string name, JavaScriptNativeFunction function) {
-      Native.ThrowIfError(Native.JsCreateNamedFunction(JavaScriptValue.FromString(name), function, IntPtr.Zero, out JavaScriptValue reference));
+      JavaScriptValue reference;
+      Native.ThrowIfError(
+        Native.JsCreateNamedFunction(
+          JavaScriptValue.FromString(name),
+          function,
+          IntPtr.Zero,
+          out reference
+        )
+      );
       return reference;
     }
 
@@ -439,7 +484,14 @@ namespace ChakraCore.API {
     /// <param name="callbackData">Data to be provided to all function callbacks.</param>
     /// <returns>The new function object.</returns>
     public static JavaScriptValue CreateFunction(JavaScriptNativeFunction function, IntPtr callbackData) {
-      Native.ThrowIfError(Native.JsCreateFunction(function, callbackData, out JavaScriptValue reference));
+      JavaScriptValue reference;
+      Native.ThrowIfError(
+        Native.JsCreateFunction(
+          function,
+          callbackData,
+          out reference
+        )
+      );
       return reference;
     }
 
@@ -453,7 +505,15 @@ namespace ChakraCore.API {
     /// <param name="callbackData">Data to be provided to all function callbacks.</param>
     /// <returns>The new function object.</returns>
     public static JavaScriptValue CreateFunction(string name, JavaScriptNativeFunction function, IntPtr callbackData) {
-      Native.ThrowIfError(Native.JsCreateNamedFunction(JavaScriptValue.FromString(name), function, callbackData, out JavaScriptValue reference));
+      JavaScriptValue reference;
+      Native.ThrowIfError(
+        Native.JsCreateNamedFunction(
+          JavaScriptValue.FromString(name),
+          function,
+          callbackData,
+          out reference
+        )
+      );
       return reference;
     }
 
@@ -466,7 +526,8 @@ namespace ChakraCore.API {
     /// <param name="length">The initial length of the array.</param>
     /// <returns>The new array object.</returns>
     public static JavaScriptValue CreateArray(uint length) {
-      Native.ThrowIfError(Native.JsCreateArray(length, out JavaScriptValue reference));
+      JavaScriptValue reference;
+      Native.ThrowIfError(Native.JsCreateArray(length, out reference));
       return reference;
     }
 
@@ -479,7 +540,8 @@ namespace ChakraCore.API {
     /// <param name="message">Message for the error object.</param>
     /// <returns>The new error object.</returns>
     public static JavaScriptValue CreateError(JavaScriptValue message) {
-      Native.ThrowIfError(Native.JsCreateError(message, out JavaScriptValue reference));
+      JavaScriptValue reference;
+      Native.ThrowIfError(Native.JsCreateError(message, out reference));
       return reference;
     }
 
@@ -496,7 +558,8 @@ namespace ChakraCore.API {
     /// <param name="message">Message for the error object.</param>
     /// <returns>The new error object.</returns>
     public static JavaScriptValue CreateRangeError(JavaScriptValue message) {
-      Native.ThrowIfError(Native.JsCreateRangeError(message, out JavaScriptValue reference));
+      JavaScriptValue reference;
+      Native.ThrowIfError(Native.JsCreateRangeError(message, out reference));
       return reference;
     }
 
@@ -513,7 +576,8 @@ namespace ChakraCore.API {
     /// <param name="message">Message for the error object.</param>
     /// <returns>The new error object.</returns>
     public static JavaScriptValue CreateReferenceError(JavaScriptValue message) {
-      Native.ThrowIfError(Native.JsCreateReferenceError(message, out JavaScriptValue reference));
+      JavaScriptValue reference;
+      Native.ThrowIfError(Native.JsCreateReferenceError(message, out reference));
       return reference;
     }
 
@@ -530,7 +594,8 @@ namespace ChakraCore.API {
     /// <param name="message">Message for the error object.</param>
     /// <returns>The new error object.</returns>
     public static JavaScriptValue CreateSyntaxError(JavaScriptValue message) {
-      Native.ThrowIfError(Native.JsCreateSyntaxError(message, out JavaScriptValue reference));
+      JavaScriptValue reference;
+      Native.ThrowIfError(Native.JsCreateSyntaxError(message, out reference));
       return reference;
     }
 
@@ -547,7 +612,8 @@ namespace ChakraCore.API {
     /// <param name="message">Message for the error object.</param>
     /// <returns>The new error object.</returns>
     public static JavaScriptValue CreateTypeError(JavaScriptValue message) {
-      Native.ThrowIfError(Native.JsCreateTypeError(message, out JavaScriptValue reference));
+      JavaScriptValue reference;
+      Native.ThrowIfError(Native.JsCreateTypeError(message, out reference));
       return reference;
     }
 
@@ -564,7 +630,8 @@ namespace ChakraCore.API {
     /// <param name="message">Message for the error object.</param>
     /// <returns>The new error object.</returns>
     public static JavaScriptValue CreateUriError(JavaScriptValue message) {
-      Native.ThrowIfError(Native.JsCreateURIError(message, out JavaScriptValue reference));
+      JavaScriptValue reference;
+      Native.ThrowIfError(Native.JsCreateURIError(message, out reference));
       return reference;
     }
 
@@ -582,7 +649,8 @@ namespace ChakraCore.API {
     /// </remarks>
     /// <returns>The object's new reference count.</returns>
     public uint AddRef() {
-      Native.ThrowIfError(Native.JsAddRef(this, out uint count));
+      uint count;
+      Native.ThrowIfError(Native.JsAddRef(this, out count));
       return count;
     }
 
@@ -594,7 +662,8 @@ namespace ChakraCore.API {
     /// </remarks>
     /// <returns>The object's new reference count.</returns>
     public uint Release() {
-      Native.ThrowIfError(Native.JsRelease(this, out uint count));
+      uint count;
+      Native.ThrowIfError(Native.JsRelease(this, out count));
       return count;
     }
 
@@ -606,7 +675,8 @@ namespace ChakraCore.API {
     /// </remarks>
     /// <returns>The converted value.</returns>
     public bool ToBoolean() {
-      Native.ThrowIfError(Native.JsBooleanToBool(this, out bool value));
+      bool value;
+      Native.ThrowIfError(Native.JsBooleanToBool(this, out value));
       return value;
     }
 
@@ -624,7 +694,8 @@ namespace ChakraCore.API {
     /// </remarks>
     /// <returns>The <c>double</c> value.</returns>
     public double ToDouble() {
-      Native.ThrowIfError(Native.JsNumberToDouble(this, out double value));
+      double value;
+      Native.ThrowIfError(Native.JsNumberToDouble(this, out value));
       return value;
     }
 
@@ -642,7 +713,8 @@ namespace ChakraCore.API {
     /// </remarks>
     /// <returns>The <c>int</c> value.</returns>
     public int ToInt32() {
-      Native.ThrowIfError(Native.JsNumberToInt(this, out int value));
+      int value;
+      Native.ThrowIfError(Native.JsNumberToInt(this, out value));
       return value;
     }
 
@@ -660,21 +732,23 @@ namespace ChakraCore.API {
     /// </remarks>
     /// <returns>The string.</returns>
     public new string ToString() {
+      int bufferLength;
       Native.ThrowIfError(
         Native.JsGetStringLength(
           this,
-          out int bufferLength
+          out bufferLength
         )
       ); // using JsCopyStringUtf16 to get needed size needs a max length number
 
       StringBuilder sb = new StringBuilder(bufferLength);
+      UIntPtr written;
       Native.ThrowIfError(
         Native.JsCopyStringUtf16(
           this,
           0,
           bufferLength,
           sb,
-          out UIntPtr written
+          out written
         )
       );
 
@@ -689,7 +763,8 @@ namespace ChakraCore.API {
     /// </remarks>
     /// <returns>The converted value.</returns>
     public JavaScriptValue ConvertToBoolean() {
-      Native.ThrowIfError(Native.JsConvertValueToBoolean(this, out JavaScriptValue booleanReference));
+      JavaScriptValue booleanReference;
+      Native.ThrowIfError(Native.JsConvertValueToBoolean(this, out booleanReference));
       return booleanReference;
     }
 
@@ -701,7 +776,8 @@ namespace ChakraCore.API {
     /// </remarks>
     /// <returns>The converted value.</returns>
     public JavaScriptValue ConvertToNumber() {
-      Native.ThrowIfError(Native.JsConvertValueToNumber(this, out JavaScriptValue numberReference));
+      JavaScriptValue numberReference;
+      Native.ThrowIfError(Native.JsConvertValueToNumber(this, out numberReference));
       return numberReference;
     }
 
@@ -713,7 +789,8 @@ namespace ChakraCore.API {
     /// </remarks>
     /// <returns>The converted value.</returns>
     public JavaScriptValue ConvertToString() {
-      Native.ThrowIfError(Native.JsConvertValueToString(this, out JavaScriptValue stringReference));
+      JavaScriptValue stringReference;
+      Native.ThrowIfError(Native.JsConvertValueToString(this, out stringReference));
       return stringReference;
     }
 
@@ -725,7 +802,8 @@ namespace ChakraCore.API {
     /// </remarks>
     /// <returns>The converted value.</returns>
     public JavaScriptValue ConvertToObject() {
-      Native.ThrowIfError(Native.JsConvertValueToObject(this, out JavaScriptValue objectReference));
+      JavaScriptValue objectReference;
+      Native.ThrowIfError(Native.JsConvertValueToObject(this, out objectReference));
       return objectReference;
     }
 
@@ -748,7 +826,8 @@ namespace ChakraCore.API {
     /// <param name="propertyId">The ID of the property.</param>
     /// <returns>The property descriptor.</returns>
     public JavaScriptValue GetOwnPropertyDescriptor(JavaScriptPropertyId propertyId) {
-      Native.ThrowIfError(Native.JsGetOwnPropertyDescriptor(this, propertyId, out JavaScriptValue descriptorReference));
+      JavaScriptValue descriptorReference;
+      Native.ThrowIfError(Native.JsGetOwnPropertyDescriptor(this, propertyId, out descriptorReference));
       return descriptorReference;
     }
 
@@ -760,7 +839,8 @@ namespace ChakraCore.API {
     /// </remarks>
     /// <returns>An array of property names.</returns>
     public JavaScriptValue GetOwnPropertyNames() {
-      Native.ThrowIfError(Native.JsGetOwnPropertyNames(this, out JavaScriptValue propertyNamesReference));
+      JavaScriptValue propertyNamesReference;
+      Native.ThrowIfError(Native.JsGetOwnPropertyNames(this, out propertyNamesReference));
       return propertyNamesReference;
     }
 
@@ -773,7 +853,8 @@ namespace ChakraCore.API {
     /// <param name="propertyId">The ID of the property.</param>
     /// <returns>Whether the object (or a prototype) has the property.</returns>
     public bool HasProperty(JavaScriptPropertyId propertyId) {
-      Native.ThrowIfError(Native.JsHasProperty(this, propertyId, out bool hasProperty));
+      bool hasProperty;
+      Native.ThrowIfError(Native.JsHasProperty(this, propertyId, out hasProperty));
       return hasProperty;
     }
 
@@ -786,7 +867,8 @@ namespace ChakraCore.API {
     /// <param name="id">The ID of the property.</param>
     /// <returns>The value of the property.</returns>
     public JavaScriptValue GetProperty(JavaScriptPropertyId id) {
-      Native.ThrowIfError(Native.JsGetProperty(this, id, out JavaScriptValue propertyReference));
+      JavaScriptValue propertyReference;
+      Native.ThrowIfError(Native.JsGetProperty(this, id, out propertyReference));
       return propertyReference;
     }
     public JavaScriptValue GetProperty(string id) {
@@ -820,7 +902,8 @@ namespace ChakraCore.API {
     /// <param name="useStrictRules">The property set should follow strict mode rules.</param>
     /// <returns>Whether the property was deleted.</returns>
     public JavaScriptValue DeleteProperty(JavaScriptPropertyId propertyId, bool useStrictRules) {
-      Native.ThrowIfError(Native.JsDeleteProperty(this, propertyId, useStrictRules, out JavaScriptValue returnReference));
+      JavaScriptValue returnReference;
+      Native.ThrowIfError(Native.JsDeleteProperty(this, propertyId, useStrictRules, out returnReference));
       return returnReference;
     }
 
@@ -834,23 +917,25 @@ namespace ChakraCore.API {
     /// <param name="propertyDescriptor">The property descriptor.</param>
     /// <returns>Whether the property was defined.</returns>
     public bool DefineProperty(JavaScriptPropertyId propertyId, JavaScriptValue propertyDescriptor) {
+      bool result;
       Native.ThrowIfError(
         Native.JsDefineProperty(
           this,
           propertyId,
           propertyDescriptor,
-          out bool result
+          out result
         )
       );
       return result;
     }
     public bool DefineProperty(string id, JavaScriptValue propertyDescriptor) {
+      bool result;
       Native.ThrowIfError(
         Native.JsDefineProperty(
           this,
           JavaScriptPropertyId.FromString(id),
           propertyDescriptor,
-          out bool result
+          out result
         )
       );
       return result;
@@ -865,7 +950,8 @@ namespace ChakraCore.API {
     /// <param name="index">The index to test.</param>
     /// <returns>Whether the object has an value at the specified index.</returns>
     public bool HasIndexedProperty(JavaScriptValue index) {
-      Native.ThrowIfError(Native.JsHasIndexedProperty(this, index, out bool hasProperty));
+      bool hasProperty;
+      Native.ThrowIfError(Native.JsHasIndexedProperty(this, index, out hasProperty));
       return hasProperty;
     }
 
@@ -878,7 +964,8 @@ namespace ChakraCore.API {
     /// <param name="index">The index to retrieve.</param>
     /// <returns>The retrieved value.</returns>
     public JavaScriptValue GetIndexedProperty(JavaScriptValue index) {
-      Native.ThrowIfError(Native.JsGetIndexedProperty(this, index, out JavaScriptValue propertyReference));
+      JavaScriptValue propertyReference;
+      Native.ThrowIfError(Native.JsGetIndexedProperty(this, index, out propertyReference));
       return propertyReference;
     }
 
@@ -919,7 +1006,8 @@ namespace ChakraCore.API {
     /// <param name="other">The object to compare.</param>
     /// <returns>Whether the values are equal.</returns>
     public bool Equals(JavaScriptValue other) {
-      Native.ThrowIfError(Native.JsEquals(this, other, out bool equals));
+      bool equals;
+      Native.ThrowIfError(Native.JsEquals(this, other, out equals));
       return equals;
     }
 
@@ -937,7 +1025,8 @@ namespace ChakraCore.API {
     /// <param name="other">The object to compare.</param>
     /// <returns>Whether the values are strictly equal.</returns>
     public bool StrictEquals(JavaScriptValue other) {
-      Native.ThrowIfError(Native.JsStrictEquals(this, other, out bool equals));
+      bool equals;
+      Native.ThrowIfError(Native.JsStrictEquals(this, other, out equals));
       return equals;
     }
 
@@ -954,7 +1043,8 @@ namespace ChakraCore.API {
         throw new ArgumentOutOfRangeException("arguments");
       }
 
-      Native.ThrowIfError(Native.JsCallFunction(this, arguments, (ushort) arguments.Length, out JavaScriptValue returnReference));
+      JavaScriptValue returnReference;
+      Native.ThrowIfError(Native.JsCallFunction(this, arguments, (ushort) arguments.Length, out returnReference));
       return returnReference;
     }
 
@@ -971,7 +1061,8 @@ namespace ChakraCore.API {
         throw new ArgumentOutOfRangeException("arguments");
       }
 
-      Native.ThrowIfError(Native.JsConstructObject(this, arguments, (ushort) arguments.Length, out JavaScriptValue returnReference));
+      JavaScriptValue returnReference;
+      Native.ThrowIfError(Native.JsConstructObject(this, arguments, (ushort) arguments.Length, out returnReference));
       return returnReference;
     }
 
@@ -982,9 +1073,9 @@ namespace ChakraCore.API {
     public string ToJsonString() {
       JavaScriptPropertyId jsonId = JavaScriptPropertyId.FromString("JSON");
       JavaScriptPropertyId stringifyId = JavaScriptPropertyId.FromString("stringify");
-      var json = JavaScriptValue.GlobalObject.GetProperty(jsonId);
-      var stringify = json.GetProperty(stringifyId);
-      var result = stringify.CallFunction(json, this);
+      JavaScriptValue json = JavaScriptValue.GlobalObject.GetProperty(jsonId);
+      JavaScriptValue stringify = json.GetProperty(stringifyId);
+      JavaScriptValue result = stringify.CallFunction(json, this);
       return result.ToString();
     }
   }

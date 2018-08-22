@@ -40,22 +40,24 @@ namespace ChakraCore.API {
     /// </remarks>
     public string Name {
       get {
+        UIntPtr bufferSize;
         Native.ThrowIfError(
           Native.JsCopyPropertyId(
             this,
             null,
             (UIntPtr) 0,
-            out UIntPtr bufferSize
+            out bufferSize
           )
         );
 
         StringBuilder buffer = new StringBuilder((int) bufferSize);
+        UIntPtr written;
         Native.ThrowIfError(
           Native.JsCopyPropertyId(
             this,
             buffer,
             bufferSize,
-            out UIntPtr written
+            out written
           )
         );
 
@@ -79,11 +81,12 @@ namespace ChakraCore.API {
     /// </param>
     /// <returns>The property ID in this runtime for the given name.</returns>
     public static JavaScriptPropertyId FromString(string name) {
+      JavaScriptPropertyId id;
       Native.ThrowIfError(
         Native.JsCreatePropertyId(
           name,
           (UIntPtr) Encoding.UTF8.GetByteCount(name),
-          out JavaScriptPropertyId id
+          out id
         )
       );
       return id;

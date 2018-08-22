@@ -1,7 +1,6 @@
 using System;
 
-namespace ChakraCore.API
-{
+namespace ChakraCore.API {
   /// <summary>
   ///     A Chakra runtime.
   /// </summary>
@@ -20,8 +19,7 @@ namespace ChakraCore.API
   ///     continue to exist until Dispose is called.
   ///     </para>
   /// </remarks>
-  public struct JavaScriptRuntime : IDisposable
-  {
+  public struct JavaScriptRuntime : IDisposable {
     /// <summary>
     /// The handle.
     /// </summary>
@@ -31,24 +29,21 @@ namespace ChakraCore.API
     ///     Initializes a new instance of the <see cref="JavaScriptRuntime"/> struct.
     /// </summary>
     /// <param name="handle">The handle.</param>
-    internal JavaScriptRuntime(IntPtr handle)
-    {
+    internal JavaScriptRuntime(IntPtr handle) {
       this.handle = handle;
     }
 
     /// <summary>
     ///     Gets an invalid runtime.
     /// </summary>
-    public static JavaScriptRuntime Invalid
-    {
+    public static JavaScriptRuntime Invalid {
       get { return new JavaScriptRuntime(IntPtr.Zero); }
     }
 
     /// <summary>
     ///     Gets a value indicating whether the runtime is valid.
     /// </summary>
-    public bool IsValid
-    {
+    public bool IsValid {
       get { return handle != IntPtr.Zero; }
     }
 
@@ -65,17 +60,16 @@ namespace ChakraCore.API
     public static JavaScriptRuntime Create(
       JavaScriptRuntimeAttributes attributes = JavaScriptRuntimeAttributes.None,
       JavaScriptThreadServiceCallback threadServiceCallback = null
-    )
-    {
-      Native.ThrowIfError(Native.JsCreateRuntime(attributes, threadServiceCallback, out JavaScriptRuntime handle));
+    ) {
+      JavaScriptRuntime handle;
+      Native.ThrowIfError(Native.JsCreateRuntime(attributes, threadServiceCallback, out handle));
       return handle;
     }
 
     /// <summary>
     ///     Performs a full garbage collection.
     /// </summary>
-    public void CollectGarbage()
-    {
+    public void CollectGarbage() {
       Native.ThrowIfError(Native.JsCollectGarbage(this));
     }
 
@@ -87,10 +81,8 @@ namespace ChakraCore.API
     ///     If the runtime is active (i.e. it is set to be current on a particular thread), it cannot
     ///     be disposed.
     /// </remarks>
-    public void Dispose()
-    {
-      if (IsValid)
-      {
+    public void Dispose() {
+      if (IsValid) {
         Native.ThrowIfError(Native.JsSetCurrentContext(JavaScriptContext.Invalid));
         Native.ThrowIfError(Native.JsDisposeRuntime(this));
       }
@@ -108,11 +100,10 @@ namespace ChakraCore.API
     /// <returns>
     ///     The runtime's current memory usage, in bytes.
     /// </returns>
-    public UIntPtr MemoryUsage
-    {
-      get
-      {
-        Native.ThrowIfError(Native.JsGetRuntimeMemoryUsage(this, out UIntPtr memoryUsage));
+    public UIntPtr MemoryUsage {
+      get {
+        UIntPtr memoryUsage;
+        Native.ThrowIfError(Native.JsGetRuntimeMemoryUsage(this, out memoryUsage));
         return memoryUsage;
       }
     }
@@ -143,16 +134,14 @@ namespace ChakraCore.API
     /// <returns>
     ///     The runtime's current memory limit, in bytes, or -1 if no limit has been set.
     /// </returns>
-    public UIntPtr MemoryLimit
-    {
-      get
-      {
-        Native.ThrowIfError(Native.JsGetRuntimeMemoryLimit(this, out UIntPtr memoryLimit));
+    public UIntPtr MemoryLimit {
+      get {
+        UIntPtr memoryLimit;
+        Native.ThrowIfError(Native.JsGetRuntimeMemoryLimit(this, out memoryLimit));
         return memoryLimit;
       }
 
-      set
-      {
+      set {
         Native.ThrowIfError(Native.JsSetRuntimeMemoryLimit(this, value));
       }
     }
@@ -183,8 +172,7 @@ namespace ChakraCore.API
     /// <param name="allocationCallback">
     ///     Memory allocation callback to be called for memory allocation events.
     /// </param>
-    public void SetMemoryAllocationCallback(IntPtr callbackState, JavaScriptMemoryAllocationCallback allocationCallback)
-    {
+    public void SetMemoryAllocationCallback(IntPtr callbackState, JavaScriptMemoryAllocationCallback allocationCallback) {
       Native.ThrowIfError(Native.JsSetRuntimeMemoryAllocationCallback(this, callbackState, allocationCallback));
     }
 
@@ -205,8 +193,7 @@ namespace ChakraCore.API
     ///     User provided state that will be passed back to the callback.
     /// </param>
     /// <param name="beforeCollectCallback">The callback function being set.</param>
-    public void SetBeforeCollectCallback(IntPtr callbackState, JavaScriptBeforeCollectCallback beforeCollectCallback)
-    {
+    public void SetBeforeCollectCallback(IntPtr callbackState, JavaScriptBeforeCollectCallback beforeCollectCallback) {
       Native.ThrowIfError(Native.JsSetRuntimeBeforeCollectCallback(this, callbackState, beforeCollectCallback));
     }
 
@@ -221,9 +208,9 @@ namespace ChakraCore.API
     /// <returns>
     ///     The created script context.
     /// </returns>
-    public JavaScriptContext CreateContext()
-    {
-      Native.ThrowIfError(Native.JsCreateContext(this, out JavaScriptContext reference));
+    public JavaScriptContext CreateContext() {
+      JavaScriptContext reference;
+      Native.ThrowIfError(Native.JsCreateContext(this, out reference));
       return reference;
     }
 
@@ -253,28 +240,20 @@ namespace ChakraCore.API
     /// <returns>
     ///     If execution is disabled, <c>true</c>, <c>false</c> otherwise.
     /// </returns>
-    public bool Disabled
-    {
-      get
-      {
-        Native.ThrowIfError(Native.JsIsRuntimeExecutionDisabled(this, out bool isDisabled));
+    public bool Disabled {
+      get {
+        bool isDisabled;
+        Native.ThrowIfError(Native.JsIsRuntimeExecutionDisabled(this, out isDisabled));
         return isDisabled;
       }
 
-      set
-      {
+      set {
         Native.ThrowIfError(
-          value ? Native.JsDisableRuntimeExecution(this)
-                : Native.JsEnableRuntimeExecution(this)
+          value ? Native.JsDisableRuntimeExecution(this) :
+          Native.JsEnableRuntimeExecution(this)
         );
       }
     }
-
-
-
-
-
-
 
 
     // Debug Functions
@@ -287,8 +266,7 @@ namespace ChakraCore.API
     /// <remarks>
     ///     The runtime should be active on the current thread and should not be in debug state.
     /// </remarks>
-    public void DiagStartDebugging(JsDiagDebugEventCallback debugEventCallback, IntPtr callbackState)
-    {
+    public void DiagStartDebugging(JsDiagDebugEventCallback debugEventCallback, IntPtr callbackState) {
       Native.ThrowIfError(Native.JsDiagStartDebugging(this, debugEventCallback, callbackState));
     }
 
@@ -301,9 +279,9 @@ namespace ChakraCore.API
     /// <remarks>
     ///     The runtime should be active on the current thread and in debug state.
     /// </remarks>
-    public IntPtr DiagStopDebugging()
-    {
-      Native.ThrowIfError(Native.JsDiagStopDebugging(this, out IntPtr callbackState));
+    public IntPtr DiagStopDebugging() {
+      IntPtr callbackState;
+      Native.ThrowIfError(Native.JsDiagStopDebugging(this, out callbackState));
       return callbackState;
     }
 
@@ -313,11 +291,9 @@ namespace ChakraCore.API
     /// <remarks>
     ///     The runtime should be in debug state. This API can be called from another runtime.
     /// </remarks>
-    public void DiagRequestAsyncBreak(JsDiagDebugEventCallback debugEventCallback, IntPtr callbackState)
-    {
+    public void DiagRequestAsyncBreak(JsDiagDebugEventCallback debugEventCallback, IntPtr callbackState) {
       Native.ThrowIfError(Native.JsDiagRequestAsyncBreak(this));
     }
-
 
 
     /// <summary>
@@ -335,8 +311,7 @@ namespace ChakraCore.API
     /// <remarks>
     ///     The runtime should be in debug state. This API can be called from another runtime.
     /// </remarks>
-    public void JsDiagSetBreakOnException(JavaScriptDiagBreakOnExceptionAttributes exceptionAttributes)
-    {
+    public void JsDiagSetBreakOnException(JavaScriptDiagBreakOnExceptionAttributes exceptionAttributes) {
       Native.ThrowIfError(Native.JsDiagSetBreakOnException(this, exceptionAttributes));
     }
 
@@ -349,9 +324,9 @@ namespace ChakraCore.API
     /// <remarks>
     ///     The runtime should be in debug state. This API can be called from another runtime.
     /// </remarks>
-    public JavaScriptDiagBreakOnExceptionAttributes DiagGetBreakOnException()
-    {
-      Native.ThrowIfError(Native.JsDiagGetBreakOnException(this, out JavaScriptDiagBreakOnExceptionAttributes exceptionAttributes));
+    public JavaScriptDiagBreakOnExceptionAttributes DiagGetBreakOnException() {
+      JavaScriptDiagBreakOnExceptionAttributes exceptionAttributes;
+      Native.ThrowIfError(Native.JsDiagGetBreakOnException(this, out exceptionAttributes));
       return exceptionAttributes;
     }
 
@@ -385,8 +360,8 @@ namespace ChakraCore.API
       JavaScriptTTDWriteBytesToStreamCallback writeBytesToStream,
       JavaScriptTTDFlushAndCloseStreamCallback flushAndCloseStream,
       JavaScriptThreadServiceCallback threadService
-    )
-    {
+    ) {
+      JavaScriptRuntime runtime;
       Native.ThrowIfError(
         Native.JsTTDCreateRecordRuntime(
           attributes,
@@ -397,7 +372,7 @@ namespace ChakraCore.API
           writeBytesToStream,
           flushAndCloseStream,
           threadService,
-          out JavaScriptRuntime runtime
+          out runtime
         )
       );
       return runtime;
@@ -429,8 +404,8 @@ namespace ChakraCore.API
       JavaScriptTTDReadBytesFromStreamCallback readBytesFromStream,
       JavaScriptTTDFlushAndCloseStreamCallback flushAndCloseStream,
       JavaScriptThreadServiceCallback threadService
-    )
-    {
+    ) {
+      JavaScriptRuntime runtime;
       Native.ThrowIfError(
         Native.JsTTDCreateReplayRuntime(
           attributes,
@@ -441,7 +416,7 @@ namespace ChakraCore.API
           readBytesFromStream,
           flushAndCloseStream,
           threadService,
-          out JavaScriptRuntime runtime
+          out runtime
         )
       );
       return runtime;
@@ -455,9 +430,9 @@ namespace ChakraCore.API
     /// <returns>
     ///     The created script context.
     /// </returns>
-    public JavaScriptContext TTDCreateContext(bool useRuntimeTTDMode)
-    {
-      Native.ThrowIfError(Native.JsTTDCreateContext(this, useRuntimeTTDMode, out JavaScriptContext newContext));
+    public JavaScriptContext TTDCreateContext(bool useRuntimeTTDMode) {
+      JavaScriptContext newContext;
+      Native.ThrowIfError(Native.JsTTDCreateContext(this, useRuntimeTTDMode, out newContext));
       return newContext;
     }
 
@@ -475,16 +450,17 @@ namespace ChakraCore.API
       JavaScriptTTDMoveMode moveMode,
       uint kthEvent,
       ref long targetEventTime
-    )
-    {
+    ) {
+      long targetStartSnapTime;
+      long targetEndSnapTime;
       Native.ThrowIfError(
         Native.JsTTDGetSnapTimeTopLevelEventMove(
           this,
           moveMode,
           kthEvent,
           ref targetEventTime,
-          out long targetStartSnapTime,
-          out long targetEndSnapTime
+          out targetStartSnapTime,
+          out targetEndSnapTime
         )
       );
       return Tuple.Create(targetStartSnapTime, targetEndSnapTime);
@@ -496,14 +472,15 @@ namespace ChakraCore.API
     /// </summary>
     /// <param name="targetEventTime">The event time we want to get the interval for.</param>
     /// <returns>( The snapshot time that comes before the desired event, The snapshot time that comes after the desired event (-1 if the leg ends before a snapshot appears) )</returns>
-    public Tuple<long, long> TTDGetSnapShotBoundInterval(long targetEventTime)
-    {
+    public Tuple<long, long> TTDGetSnapShotBoundInterval(long targetEventTime) {
+      long startSnapTime;
+      long endSnapTime;
       Native.ThrowIfError(
         Native.JsTTDGetSnapShotBoundInterval(
           this,
           targetEventTime,
-          out long startSnapTime,
-          out long endSnapTime
+          out startSnapTime,
+          out endSnapTime
         )
       );
       return Tuple.Create(startSnapTime, endSnapTime);
@@ -515,9 +492,9 @@ namespace ChakraCore.API
     /// </summary>
     /// <param name="currentSnapStartTime">The current snapshot interval start time.</param>
     /// <returns>The resulting previous snapshot interval start time or -1 if no such time.</returns>
-    public long TTDGetPreviousSnapshotInterval(long currentSnapStartTime)
-    {
-      Native.ThrowIfError(Native.JsTTDGetPreviousSnapshotInterval(this, currentSnapStartTime, out long previousSnapTime));
+    public long TTDGetPreviousSnapshotInterval(long currentSnapStartTime) {
+      long previousSnapTime;
+      Native.ThrowIfError(Native.JsTTDGetPreviousSnapshotInterval(this, currentSnapStartTime, out previousSnapTime));
       return previousSnapTime;
     }
 
@@ -534,15 +511,15 @@ namespace ChakraCore.API
       long startSnapTime,
       long endSnapTime,
       JavaScriptTTDMoveMode moveMode
-    )
-    {
+    ) {
+      long newTargetEventTime;
       Native.ThrowIfError(
         Native.JsTTDPreExecuteSnapShotInterval(
           this,
           startSnapTime,
           endSnapTime,
           moveMode,
-          out long newTargetEventTime
+          out newTargetEventTime
         )
       );
       return newTargetEventTime;
@@ -561,11 +538,9 @@ namespace ChakraCore.API
       JavaScriptTTDMoveMode moveMode,
       long snapshotTime,
       long eventTime
-    )
-    {
+    ) {
       Native.ThrowIfError(Native.JsTTDMoveToTopLevelEvent(this, moveMode, snapshotTime, eventTime));
     }
-
 
 
   }

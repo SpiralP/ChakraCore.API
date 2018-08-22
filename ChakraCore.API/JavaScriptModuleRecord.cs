@@ -61,11 +61,12 @@ namespace ChakraCore.API {
         referencingModuleValue = JavaScriptModuleRecord.Invalid;
       }
 
+      JavaScriptModuleRecord moduleRecord;
       Native.ThrowIfError(
         Native.JsInitializeModuleRecord(
           referencingModuleValue,
           normalizedSpecifierValue,
-          out JavaScriptModuleRecord moduleRecord
+          out moduleRecord
         )
       );
       return moduleRecord;
@@ -83,8 +84,9 @@ namespace ChakraCore.API {
     }
 
     public uint AddRef() {
+      uint count;
       Native.ThrowIfError(
-        Native.JsAddRef(this, out uint count)
+        Native.JsAddRef(this, out count)
       );
       return count;
     }
@@ -110,13 +112,14 @@ namespace ChakraCore.API {
     ) {
       byte[] scriptBuffer = Encoding.UTF8.GetBytes(script);
       uint scriptLength = (uint) scriptBuffer.Length;
+      JavaScriptValue exceptionValue;
       JavaScriptErrorCode errorCode = Native.JsParseModuleSource(
         this,
         sourceContext,
         scriptBuffer,
         scriptLength,
         JavaScriptParseModuleSourceFlags.JsParseModuleSourceFlags_DataIsUTF8,
-        out JavaScriptValue exceptionValue
+        out exceptionValue
       );
       if (errorCode != JavaScriptErrorCode.NoError) {
         if (exceptionValue.IsValid) {
@@ -143,10 +146,11 @@ namespace ChakraCore.API {
     ///     The return value of the module.
     /// </returns>
     public JavaScriptValue Evaluate() {
+      JavaScriptValue result;
       Native.ThrowIfError(
         Native.JsModuleEvaluation(
           this,
-          out JavaScriptValue result
+          out result
         )
       );
       return result;
@@ -159,11 +163,12 @@ namespace ChakraCore.API {
     /// <param name="exception">An exception object - e.g. if the module file cannot be found.</param>
     public JavaScriptValue Exception {
       get {
+        JavaScriptValue value;
         Native.ThrowIfError(
           Native.JsGetModuleHostInfo(
             this,
             JavascriptModuleHostInfoKind.JsModuleHostInfo_Exception,
-            out JavaScriptValue value
+            out value
           )
         );
         return value;
@@ -185,11 +190,12 @@ namespace ChakraCore.API {
     /// <param name="hostInfo">Host defined info.</param>
     public IntPtr HostDefined {
       get {
+        IntPtr value;
         Native.ThrowIfError(
           Native.JsGetModuleHostInfo(
             this,
             JavascriptModuleHostInfoKind.JsModuleHostInfo_HostDefined,
-            out IntPtr value
+            out value
           )
         );
         return value;
@@ -215,11 +221,12 @@ namespace ChakraCore.API {
     /// <param name="callback">Callback for receiving notification when module is ready.</param>
     public NotifyModuleReadyCallback NotifyModuleReadyCallback {
       get {
+        NotifyModuleReadyCallback value;
         Native.ThrowIfError(
           Native.JsGetModuleHostInfo(
             this,
             JavascriptModuleHostInfoKind.JsModuleHostInfo_NotifyModuleReadyCallback,
-            out NotifyModuleReadyCallback value
+            out value
           )
         );
         return value;
@@ -253,11 +260,12 @@ namespace ChakraCore.API {
     /// </remarks>
     public FetchImportedModuleCallBack FetchImportedModuleCallBack {
       get {
+        FetchImportedModuleCallBack value;
         Native.ThrowIfError(
           Native.JsGetModuleHostInfo(
             this,
             JavascriptModuleHostInfoKind.JsModuleHostInfo_FetchImportedModuleCallback,
-            out FetchImportedModuleCallBack value
+            out value
           )
         );
         return value;
@@ -289,11 +297,12 @@ namespace ChakraCore.API {
     /// </remarks>
     public FetchImportedModuleFromScriptCallBack FetchImportedModuleFromScriptCallBack {
       get {
+        FetchImportedModuleFromScriptCallBack value;
         Native.ThrowIfError(
           Native.JsGetModuleHostInfo(
             this,
             JavascriptModuleHostInfoKind.JsModuleHostInfo_FetchImportedModuleFromScriptCallback,
-            out FetchImportedModuleFromScriptCallBack value
+            out value
           )
         );
         return value;
@@ -316,11 +325,12 @@ namespace ChakraCore.API {
     /// <param name="url">URL for use in error stack traces and debugging.</param>
     public string HostUrl {
       get {
+        JavaScriptValue result;
         Native.ThrowIfError(
           Native.JsGetModuleHostInfo(
             this,
             JavascriptModuleHostInfoKind.JsModuleHostInfo_Url,
-            out JavaScriptValue result
+            out result
           )
         );
         if (result.IsValid && result.ValueType == JavaScriptValueType.String) {
@@ -352,10 +362,11 @@ namespace ChakraCore.API {
     /// </returns>
     public JavaScriptValue Namespace {
       get {
+        JavaScriptValue moduleNamespace;
         Native.ThrowIfError(
           Native.JsGetModuleNamespace(
             this,
-            out JavaScriptValue moduleNamespace
+            out moduleNamespace
           )
         );
         return moduleNamespace;

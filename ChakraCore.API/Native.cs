@@ -74,14 +74,16 @@ namespace ChakraCore.API {
           case JavaScriptErrorCode.ScriptException:
             {
               if (!ignoreScriptError) {
-                string msg = getErrorMessageAndObject(out JavaScriptValue errorObject);
+                JavaScriptValue errorObject;
+                string msg = getErrorMessageAndObject(out errorObject);
                 throw new JavaScriptScriptException(error, errorObject, $"Script threw an exception. {msg}");
               }
               break;
             }
           case JavaScriptErrorCode.ScriptCompile:
             {
-              string msg = getErrorMessageAndObject(out JavaScriptValue errorObject);
+              JavaScriptValue errorObject;
+              string msg = getErrorMessageAndObject(out errorObject);
               throw new JavaScriptScriptException(error, errorObject, $"Compile error. {msg}");
             }
 
@@ -101,7 +103,8 @@ namespace ChakraCore.API {
     }
 
     private static string getErrorMessageAndObject(out JavaScriptValue errorObject) {
-      JavaScriptErrorCode result = JsGetAndClearExceptionWithMetadata(out JavaScriptValue metadata); // exception line column length source url
+      JavaScriptValue metadata;
+      JavaScriptErrorCode result = JsGetAndClearExceptionWithMetadata(out metadata); // exception line column length source url
       if (result != JavaScriptErrorCode.NoError) {
         errorObject = JavaScriptValue.Invalid;
         return "Failed to get js Error! JsGetAndClearExceptionWithMetadata failed: " + result;
@@ -1342,7 +1345,13 @@ namespace ChakraCore.API {
     ///     The code <c>JsNoError</c> if the operation succeeded, a failure code otherwise.
     /// </returns>
     [DllImport(DllName)]
-    public static extern JavaScriptErrorCode JsGetTypedArrayStorage(JavaScriptValue typedArray, out IntPtr data, out uint bufferLength, out JavaScriptTypedArrayType arrayType, out int elementSize);
+    public static extern JavaScriptErrorCode JsGetTypedArrayStorage(
+      JavaScriptValue typedArray,
+      out IntPtr data,
+      out uint bufferLength,
+      out JavaScriptTypedArrayType arrayType,
+      out int elementSize
+    );
 
     /// <summary>
     ///     Obtains the underlying memory storage used by a DataView.
