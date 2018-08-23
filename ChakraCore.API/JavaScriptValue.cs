@@ -1078,5 +1078,103 @@ namespace ChakraCore.API {
       JavaScriptValue result = stringify.CallFunction(json, this);
       return result.ToString();
     }
+
+    /// <summary>
+    ///     Gets the symbol associated with the property ID.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///     Requires an active script context.
+    ///     </para>
+    /// </remarks>
+    /// <param name="propertyId">The property ID to get the symbol of.</param>
+    /// <returns>
+    ///     The symbol associated with the property ID.
+    /// </returns>
+    public static JavaScriptValue GetSymbolFromPropertyId(JavaScriptPropertyId propertyId) {
+      JavaScriptValue symbol;
+      Native.ThrowIfError(
+        Native.JsGetSymbolFromPropertyId(
+          propertyId,
+          out symbol
+        )
+      );
+      return symbol;
+    }
+
+    /// <summary>
+    ///     Gets the property ID associated with the symbol.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///     Property IDs are specific to a context and cannot be used across contexts.
+    ///     </para>
+    ///     <para>
+    ///     Requires an active script context.
+    ///     </para>
+    /// </remarks>
+    /// <param name="symbol">
+    ///     The symbol whose property ID is being retrieved.
+    /// </param>
+    /// <returns>
+    ///     The property ID for the given symbol.
+    /// </returns>
+    public JavaScriptPropertyId GetPropertyIdFromSymbol() {
+      JavaScriptPropertyId propertyId;
+      Native.ThrowIfError(
+        Native.JsGetPropertyIdFromSymbol(
+          this,
+          out propertyId
+        )
+      );
+      return propertyId;
+    }
+
+
+    /// <summary>
+    ///     Creates a Javascript symbol.
+    /// </summary>
+    /// <remarks>
+    ///     Requires an active script context.
+    /// </remarks>
+    /// <param name="description">The string description of the symbol. Can be null.</param>
+    /// <returns>
+    ///     The new symbol.
+    /// </returns>
+    public static JavaScriptValue CreateSymbol(JavaScriptValue description) {
+      JavaScriptValue symbol;
+      Native.ThrowIfError(
+        Native.JsCreateSymbol(
+          description,
+          out symbol
+        )
+      );
+      return symbol;
+    }
+    public static JavaScriptValue CreateSymbol(string description) {
+      return CreateSymbol(JavaScriptValue.FromString(description));
+    }
+
+    /// <summary>
+    ///     Gets the list of all symbol properties on the object.
+    /// </summary>
+    /// <remarks>
+    ///     Requires an active script context.
+    /// </remarks>
+    /// <returns>
+    ///     An array of property symbols.
+    /// </returns>
+    public JavaScriptValue GetOwnPropertySymbols() {
+      JavaScriptValue propertySymbols;
+      Native.ThrowIfError(
+        Native.JsGetOwnPropertySymbols(
+          this,
+          out propertySymbols
+        )
+      );
+      return propertySymbols;
+    }
+
+
   }
 }

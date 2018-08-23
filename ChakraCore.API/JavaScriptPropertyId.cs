@@ -92,6 +92,82 @@ namespace ChakraCore.API {
       return id;
     }
 
+
+    /// <summary>
+    ///     Gets the symbol associated with the property ID.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///     Requires an active script context.
+    ///     </para>
+    /// </remarks>
+    /// <returns>
+    ///     The symbol associated with the property ID.
+    /// </returns>
+    public JavaScriptValue GetSymbol() {
+      JavaScriptValue symbol;
+      Native.ThrowIfError(
+        Native.JsGetSymbolFromPropertyId(
+          this,
+          out symbol
+        )
+      );
+      return symbol;
+    }
+
+    /// <summary>
+    ///     Gets the type of property
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///     Requires an active script context.
+    ///     </para>
+    /// </remarks>
+    /// <returns>
+    ///     The JsPropertyIdType of the given property ID.
+    /// </returns>
+    public JavaScriptPropertyIdType Type {
+      get {
+        JavaScriptPropertyIdType propertyIdType;
+        Native.ThrowIfError(
+          Native.JsGetPropertyIdType(
+            this,
+            out propertyIdType
+          )
+        );
+        return propertyIdType;
+      }
+    }
+
+    /// <summary>
+    ///     Gets the property ID associated with the symbol.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///     Property IDs are specific to a context and cannot be used across contexts.
+    ///     </para>
+    ///     <para>
+    ///     Requires an active script context.
+    ///     </para>
+    /// </remarks>
+    /// <param name="symbol">
+    ///     The symbol whose property ID is being retrieved.
+    /// </param>
+    /// <returns>
+    ///     The property ID for the given symbol.
+    /// </returns>
+    public static JavaScriptPropertyId FromSymbol(JavaScriptValue symbol) {
+      JavaScriptPropertyId propertyId;
+      Native.ThrowIfError(
+        Native.JsGetPropertyIdFromSymbol(
+          symbol,
+          out propertyId
+        )
+      );
+      return propertyId;
+    }
+
+
     /// <summary>
     ///     The equality operator for property IDs.
     /// </summary>
