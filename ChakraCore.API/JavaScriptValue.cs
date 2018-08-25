@@ -954,6 +954,9 @@ namespace ChakraCore.API {
       Native.ThrowIfError(Native.JsHasIndexedProperty(this, index, out hasProperty));
       return hasProperty;
     }
+    public bool HasIndexedProperty(int index) {
+      return HasIndexedProperty(JavaScriptValue.FromInt32(index));
+    }
 
     /// <summary>
     ///     Retrieve the value at the specified index of an object.
@@ -968,6 +971,9 @@ namespace ChakraCore.API {
       Native.ThrowIfError(Native.JsGetIndexedProperty(this, index, out propertyReference));
       return propertyReference;
     }
+    public JavaScriptValue GetIndexedProperty(int index) {
+      return GetIndexedProperty(JavaScriptValue.FromInt32(index));
+    }
 
     /// <summary>
     ///     Set the value at the specified index of an object.
@@ -980,6 +986,12 @@ namespace ChakraCore.API {
     public void SetIndexedProperty(JavaScriptValue index, JavaScriptValue value) {
       Native.ThrowIfError(Native.JsSetIndexedProperty(this, index, value));
     }
+    public void SetIndexedProperty(int index, JavaScriptValue value) {
+      SetIndexedProperty(
+        JavaScriptValue.FromInt32(index),
+        value
+      );
+    }
 
     /// <summary>
     ///     Delete the value at the specified index of an object.
@@ -990,6 +1002,9 @@ namespace ChakraCore.API {
     /// <param name="index">The index to delete.</param>
     public void DeleteIndexedProperty(JavaScriptValue index) {
       Native.ThrowIfError(Native.JsDeleteIndexedProperty(this, index));
+    }
+    public void DeleteIndexedProperty(int index) {
+      DeleteIndexedProperty(JavaScriptValue.FromInt32(index));
     }
 
     /// <summary>
