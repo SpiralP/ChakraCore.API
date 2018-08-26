@@ -871,8 +871,24 @@ namespace ChakraCore.API {
       Native.ThrowIfError(Native.JsGetProperty(this, id, out propertyReference));
       return propertyReference;
     }
+
     public JavaScriptValue GetProperty(string id) {
       return this.GetProperty(JavaScriptPropertyId.FromString(id));
+    }
+
+    public JavaScriptValue GetProperty(JavaScriptValue key) {
+      JavaScriptPropertyId id;
+      if (key.ValueType == JavaScriptValueType.String) {
+        id = JavaScriptPropertyId.FromString(key.ToString());
+      } else if (key.ValueType == JavaScriptValueType.Symbol) {
+        id = JavaScriptPropertyId.FromSymbol(key);
+      } else {
+        throw new JavaScriptUsageException(
+          JavaScriptErrorCode.CategoryUsage,
+          "When using a JavaScriptValue as the key in a property, it must be either a String or a Symbol."
+        );
+      }
+      return this.GetProperty(id);
     }
 
     /// <summary>
@@ -890,6 +906,21 @@ namespace ChakraCore.API {
 
     public void SetProperty(string id, JavaScriptValue value, bool useStrictRules = true) {
       this.SetProperty(JavaScriptPropertyId.FromString(id), value, useStrictRules);
+    }
+
+    public void SetProperty(JavaScriptValue key, JavaScriptValue value, bool useStrictRules = true) {
+      JavaScriptPropertyId id;
+      if (key.ValueType == JavaScriptValueType.String) {
+        id = JavaScriptPropertyId.FromString(key.ToString());
+      } else if (key.ValueType == JavaScriptValueType.Symbol) {
+        id = JavaScriptPropertyId.FromSymbol(key);
+      } else {
+        throw new JavaScriptUsageException(
+          JavaScriptErrorCode.CategoryUsage,
+          "When using a JavaScriptValue as the key in a property, it must be either a String or a Symbol."
+        );
+      }
+      this.SetProperty(id, value, useStrictRules);
     }
 
     /// <summary>
