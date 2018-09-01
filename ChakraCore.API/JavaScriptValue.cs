@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace ChakraCore.API {
@@ -753,6 +754,28 @@ namespace ChakraCore.API {
       );
 
       return sb.ToString(0, (int) written); // works because written is "characters written"
+    }
+
+    /// <summary>
+    ///     Converts a JavaScript Array to a List.
+    /// </summary>
+    /// <remarks>
+    ///     Requires an active script context.
+    /// </remarks>
+    /// <returns>The converted value.</returns>
+    public List<JavaScriptValue> ToList() {
+      if (
+        this.ValueType != JavaScriptValueType.Array &&
+        this.ValueType != JavaScriptValueType.TypedArray
+      ) {
+        Native.ThrowIfError(JavaScriptErrorCode.InvalidArgument);
+      }
+      List<JavaScriptValue> list = new List<JavaScriptValue>();
+      var length = this.GetProperty("length").ToInt32();
+      for (var i = 0; i < length; i++) {
+        list.Add(this.GetIndexedProperty(i));
+      }
+      return list;
     }
 
     /// <summary>
