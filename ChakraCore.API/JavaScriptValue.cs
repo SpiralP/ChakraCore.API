@@ -72,74 +72,301 @@ namespace ChakraCore.API {
       }
     }
 
+
     /// <summary>
-    /// map internal memory to chakracore engine
+    ///     Creates a Javascript array object.
     /// </summary>
-    /// <param name="data">data block</param>
-    /// <param name="byteLength">length of data</param>
-    /// <param name="finalizeCallback">callback for object disposed in js engine</param>
-    /// <param name="callbackState">reference, can be null</param>
-    /// <returns></returns>
-    public static JavaScriptValue CreateExternalArrayBuffer(IntPtr data, uint byteLength, JavaScriptFinalizeCallback finalizeCallback, IntPtr callbackState) {
-      JavaScriptValue result;
-      Native.ThrowIfError(Native.JsCreateExternalArrayBuffer(data, byteLength, finalizeCallback, callbackState, out result));
-      return result;
+    /// <remarks>
+    ///     Requires an active script context.
+    /// </remarks>
+    /// <param name="length">The initial length of the array.</param>
+    /// <returns>
+    ///     The new array object.
+    /// </returns>
+    public static JavaScriptValue CreateArray(uint length) {
+      JavaScriptValue reference;
+      Native.ThrowIfError(Native.JsCreateArray(length, out reference));
+      return reference;
     }
 
-
+    /// <summary>
+    ///     Creates a Javascript ArrayBuffer object.
+    /// </summary>
+    /// <remarks>
+    ///     Requires an active script context.
+    /// </remarks>
+    /// <param name="byteLength">
+    ///     The number of bytes in the ArrayBuffer.
+    /// </param>
+    /// <returns>
+    ///     The new ArrayBuffer object.
+    /// </returns>
     public static JavaScriptValue CreateArrayBuffer(uint byteLength) {
       JavaScriptValue result;
       Native.ThrowIfError(Native.JsCreateArrayBuffer(byteLength, out result));
       return result;
     }
 
-
-    public static JavaScriptValue CreateTypedArray(JavaScriptTypedArrayType arrayType, JavaScriptValue arrayBuffer, uint byteOffset, uint elementLength) {
+    /// <summary>
+    ///     Creates a Javascript ArrayBuffer object to access external memory.
+    /// </summary>
+    /// <remarks>Requires an active script context.</remarks>
+    /// <param name="data">A pointer to the external memory.</param>
+    /// <param name="byteLength">The number of bytes in the external memory.</param>
+    /// <param name="finalizeCallback">A callback for when the object is finalized. May be null.</param>
+    /// <param name="callbackState">User provided state that will be passed back to finalizeCallback.</param>
+    /// <returns>
+    ///     The new ArrayBuffer object.
+    /// </returns>
+    /// <returns></returns>
+    public static JavaScriptValue CreateExternalArrayBuffer(
+      IntPtr data,
+      uint byteLength,
+      JavaScriptFinalizeCallback finalizeCallback,
+      IntPtr callbackState
+    ) {
       JavaScriptValue result;
-      Native.ThrowIfError(Native.JsCreateTypedArray(arrayType, arrayBuffer, byteOffset, elementLength, out result));
+      Native.ThrowIfError(
+        Native.JsCreateExternalArrayBuffer(
+          data,
+          byteLength,
+          finalizeCallback,
+          callbackState,
+          out result
+        )
+      );
       return result;
     }
 
-    public static IntPtr GetArrayBufferStorage(JavaScriptValue value, out uint bufferSize) {
+    /// <summary>
+    ///     Creates a Javascript typed array object.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///     The <c>baseArray</c> can be an <c>ArrayBuffer</c>, another typed array, or a JavaScript
+    ///     <c>Array</c>. The returned typed array will use the baseArray if it is an ArrayBuffer, or
+    ///     otherwise create and use a copy of the underlying source array.
+    ///     </para>
+    ///     <para>
+    ///     Requires an active script context.
+    ///     </para>
+    /// </remarks>
+    /// <param name="arrayType">The type of the array to create.</param>
+    /// <param name="baseArray">
+    ///     The base array of the new array. Use <c>JS_INVALID_REFERENCE</c> if no base array.
+    /// </param>
+    /// <param name="byteOffset">
+    ///     The offset in bytes from the start of baseArray (ArrayBuffer) for result typed array to reference.
+    ///     Only applicable when baseArray is an ArrayBuffer object. Must be 0 otherwise.
+    /// </param>
+    /// <param name="elementLength">
+    ///     The number of elements in the array. Only applicable when creating a new typed array without
+    ///     baseArray (baseArray is <c>JS_INVALID_REFERENCE</c>) or when baseArray is an ArrayBuffer object.
+    ///     Must be 0 otherwise.
+    /// </param>
+    /// <returns>
+    ///     The new typed array object.
+    /// </returns>
+    public static JavaScriptValue CreateTypedArray(
+      JavaScriptTypedArrayType arrayType,
+      JavaScriptValue baseArray,
+      uint byteOffset,
+      uint elementLength
+    ) {
+      JavaScriptValue result;
+      Native.ThrowIfError(
+        Native.JsCreateTypedArray(
+          arrayType,
+          baseArray,
+          byteOffset,
+          elementLength,
+          out result
+        )
+      );
+      return result;
+    }
+
+    /// <summary>
+    ///     Creates a Javascript DataView object.
+    /// </summary>
+    /// <remarks>
+    ///     Requires an active script context.
+    /// </remarks>
+    /// <param name="arrayBuffer">
+    ///     An existing ArrayBuffer object to use as the storage for the result DataView object.
+    /// </param>
+    /// <param name="byteOffset">
+    ///     The offset in bytes from the start of arrayBuffer for result DataView to reference.
+    /// </param>
+    /// <param name="byteLength">
+    ///     The number of bytes in the ArrayBuffer for result DataView to reference.
+    /// </param>
+    /// <returns>
+    ///     The new DataView object.
+    /// </returns>
+    public static JavaScriptValue CreateDataView(
+      JavaScriptValue arrayBuffer,
+      uint byteOffset,
+      uint byteLength
+    ) {
+      JavaScriptValue result;
+      Native.ThrowIfError(
+        Native.JsCreateDataView(
+          arrayBuffer,
+          byteOffset,
+          byteLength,
+          out result
+        )
+      );
+      return result;
+    }
+
+    public JavaScriptValue CreateDataView(uint byteOffset, uint byteLength) {
+      return CreateDataView(this, byteOffset, byteLength);
+    }
+
+    /// <summary>
+    ///     Obtains frequently used properties of a typed array.
+    /// </summary>
+    /// <param name="typedArray">The typed array instance.</param>
+    /// <param name="arrayType">The type of the array.</param>
+    /// <param name="arrayBuffer">The ArrayBuffer backstore of the array.</param>
+    /// <param name="byteOffset">The offset in bytes from the start of arrayBuffer referenced by the array.</param>
+    /// <param name="byteLength">The number of bytes in the array.</param>
+    public static void GetTypedArrayInfo(
+      JavaScriptValue typedArray,
+      out JavaScriptTypedArrayType arrayType,
+      out JavaScriptValue arrayBuffer,
+      out uint byteOffset,
+      out uint byteLength
+    ) {
+      Native.ThrowIfError(
+        Native.JsGetTypedArrayInfo(
+          typedArray,
+          out arrayType,
+          out arrayBuffer,
+          out byteOffset,
+          out byteLength
+        )
+      );
+    }
+
+    public void GetTypedArrayInfo(
+      out JavaScriptTypedArrayType arrayType,
+      out JavaScriptValue arrayBuffer,
+      out uint byteOffset,
+      out uint byteLength
+    ) {
+      GetTypedArrayInfo(
+        this,
+        out arrayType,
+        out arrayBuffer,
+        out byteOffset,
+        out byteLength
+      );
+    }
+
+    /// <summary>
+    ///     Obtains the underlying memory storage used by an <c>ArrayBuffer</c>.
+    /// </summary>
+    /// <param name="arrayBuffer">The ArrayBuffer instance.</param>
+    /// <param name="bufferLength">The number of bytes in the buffer.</param>
+    /// <returns>
+    ///     The ArrayBuffer's buffer. The lifetime of the buffer returned is the same as the lifetime of the
+    ///     the ArrayBuffer. The buffer pointer does not count as a reference to the ArrayBuffer for the purpose
+    ///     of garbage collection.
+    /// </returns>
+    public static IntPtr GetArrayBufferStorage(JavaScriptValue arrayBuffer, out uint bufferLength) {
       IntPtr data;
-      uint bufferLength;
-      Native.ThrowIfError(Native.JsGetArrayBufferStorage(value, out data, out bufferLength));
-      bufferSize = bufferLength;
+      Native.ThrowIfError(
+        Native.JsGetArrayBufferStorage(
+          arrayBuffer,
+          out data,
+          out bufferLength
+        )
+      );
       return data;
     }
 
-    public static JavaScriptValue CreateDataView(JavaScriptValue arrayBuffer, uint byteOffset, uint byteOffsetLength) {
-      JavaScriptValue result;
-      Native.ThrowIfError(Native.JsCreateDataView(arrayBuffer, byteOffset, byteOffsetLength, out result));
-      return result;
+    public IntPtr GetArrayBufferStorage(out uint bufferLength) {
+      return GetArrayBufferStorage(this, out bufferLength);
     }
 
-    public static void GetDataViewStorage(JavaScriptValue dataView, out IntPtr data, out uint bufferLength) {
-      IntPtr _data;
-      uint _bufferLength;
-      Native.ThrowIfError(Native.JsGetDataViewStorage(dataView, out _data, out _bufferLength));
-      data = _data;
-      bufferLength = _bufferLength;
+    /// <summary>
+    ///     Obtains the underlying memory storage used by a typed array.
+    /// </summary>
+    /// <param name="typedArray">The typed array instance.</param>
+    /// <param name="bufferLength">The number of bytes in the buffer.</param>
+    /// <param name="arrayType">The type of the array.</param>
+    /// <param name="elementSize">
+    ///     The size of an element of the array.
+    /// </param>
+    /// <returns>
+    ///     The array's buffer. The lifetime of the buffer returned is the same as the lifetime of the
+    ///     the array. The buffer pointer does not count as a reference to the array for the purpose
+    ///     of garbage collection.
+    /// </returns>
+    public static IntPtr GetTypedArrayStorage(
+      JavaScriptValue typedArray,
+      out uint bufferLength,
+      out JavaScriptTypedArrayType arrayType,
+      out int elementSize
+    ) {
+      IntPtr buffer;
+      Native.ThrowIfError(
+        Native.JsGetTypedArrayStorage(
+          typedArray,
+          out buffer,
+          out bufferLength,
+          out arrayType,
+          out elementSize
+        )
+      );
+      return buffer;
     }
 
-
-    public static void GetTypedArrayStorage(JavaScriptValue typedArray, out IntPtr data, out uint bufferLength, out JavaScriptTypedArrayType arrayType, out int elementSize) {
-      IntPtr _data;
-      uint _bufferLength;
-      JavaScriptTypedArrayType _arrayType;
-      int _elementSize;
-      Native.ThrowIfError(Native.JsGetTypedArrayStorage(
-        typedArray,
-        out _data,
-        out _bufferLength,
-        out _arrayType,
-        out _elementSize
-      ));
-      data = _data;
-      bufferLength = _bufferLength;
-      arrayType = _arrayType;
-      elementSize = _elementSize;
+    public IntPtr GetTypedArrayStorage(
+      out uint bufferLength,
+      out JavaScriptTypedArrayType arrayType,
+      out int elementSize
+    ) {
+      return GetTypedArrayStorage(
+        this,
+        out bufferLength,
+        out arrayType,
+        out elementSize
+      );
     }
+
+    /// <summary>
+    ///     Obtains the underlying memory storage used by a DataView.
+    /// </summary>
+    /// <param name="dataView">The DataView instance.</param>
+    /// <param name="bufferLength">The number of bytes in the buffer.</param>
+    /// <returns>
+    ///     The DataView's buffer. The lifetime of the buffer returned is the same as the lifetime of the
+    ///     the DataView. The buffer pointer does not count as a reference to the DataView for the purpose
+    ///     of garbage collection.
+    /// </returns>
+    public static IntPtr GetDataViewStorage(
+      JavaScriptValue dataView,
+      out uint bufferLength
+    ) {
+      IntPtr data;
+      Native.ThrowIfError(
+        Native.JsGetDataViewStorage(
+          dataView,
+          out data,
+          out bufferLength
+        )
+      );
+      return data;
+    }
+
+    public IntPtr GetDataViewStorage(out uint bufferLength) {
+      return GetDataViewStorage(this, out bufferLength);
+    }
+
 
     /// <summary>
     ///     Gets the value of <c>null</c> in the current script context.
@@ -515,20 +742,6 @@ namespace ChakraCore.API {
           out reference
         )
       );
-      return reference;
-    }
-
-    /// <summary>
-    ///     Creates a JavaScript array object.
-    /// </summary>
-    /// <remarks>
-    ///     Requires an active script context.
-    /// </remarks>
-    /// <param name="length">The initial length of the array.</param>
-    /// <returns>The new array object.</returns>
-    public static JavaScriptValue CreateArray(uint length) {
-      JavaScriptValue reference;
-      Native.ThrowIfError(Native.JsCreateArray(length, out reference));
       return reference;
     }
 
